@@ -4,9 +4,11 @@
         "outDir": "js",
         "target": "es5",
         "sourceMap": true,
+        "removeComments": true,
         "watch": true
     },
     "files": [
+        "typings/jquery.d.ts",
         "main.ts"
     ]
 }
