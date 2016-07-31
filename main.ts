@@ -1,4 +1,8 @@
 
+class Autocomplete(asd)  {
+    export function test() {}
+}
+
 /// <reference path="typings/jquery.d.ts" />
 let AUTOCOMPLETE = {
     'PFR' : 'preflop raiser',
@@ -39,5 +43,7 @@ function handleInput(e) {
 
     }
 }
+let ac = Autocomplete
+
 $('#read').val('Lorem pfr dolor sit amet');
  input.on('keydown', handleInput);

@@ -1,3 +1,12 @@
+var Autocomplete = (function () {
+    function Autocomplete() {
+    }
+    return Autocomplete;
+}());
+(function (asd) {
+    function test() { }
+    exports.test = test;
+});
 /// <reference path="typings/jquery.d.ts" />
 var AUTOCOMPLETE = {
     'PFR': 'preflop raiser',
@@ -28,6 +37,7 @@ function handleInput(e) {
         inputElement.setSelectionRange(cursorPosition, cursorPosition);
     }
 }
+var ac = Autocomplete;
 $('#read').val('Lorem pfr dolor sit amet');
 input.on('keydown', handleInput);
 //# sourceMappingURL=main.js.map
