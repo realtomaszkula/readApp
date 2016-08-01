@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>jQ</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <div id="preview"></div>
   <div style='text-align: center'>
-      <input style='width: 400px;' type="text" id='read'>
+      <input type="text" id='read'>
     </div>
-  <script src="js/main.js"></script>
+
+    <script data-main="main" src="node_modules/requirejs/require.js"></script>
 </body>
 </html>

@@ -1,14 +1,13 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "outDir": "js",
+        "module": "amd",
+        "outDir": "scripts/js",
         "target": "es5",
         "sourceMap": true,
         "removeComments": true,
         "watch": true
     },
     "files": [
-        "typings/jquery.d.ts",
-        "main.ts"
+        "scripts/app.ts"
     ]
 }
