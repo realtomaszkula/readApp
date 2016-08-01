@@ -26,19 +26,24 @@ function tryAutocomplete():void {
 }
 
 
-function previewMessage():void {
-  // $preview.text()
+function previewMessage(e):void {
+    let pressedKey: string = String.fromCharCode(e.which);
+    let isShiftPressed: boolean = e.shiftKey;
+    
+    pressedKey = (!isShiftPressed) ?  pressedKey.toLowerCase() : pressedKey
+
+    let previewString: = $preview.text() + pressedKey;
+    $preview.text(previewString );
 }
 
 function handleInput(e) {
-
     if(e.which == TAB_KEY) {
         e.preventDefault(); 
         e.stopPropagation();
         tryAutocomplete();
     }
     
-    previewMessage();
+    previewMessage(e);
 }
 
 const TAB_KEY = 9;

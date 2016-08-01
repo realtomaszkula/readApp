@@ -14,7 +14,12 @@ define(["require", "exports", './classes/autocomplete', 'jquery'], function (req
         $input.select();
         inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
     }
-    function previewMessage() {
+    function previewMessage(e) {
+        var pressedKey = String.fromCharCode(e.which);
+        var isShiftPressed = e.shiftKey;
+        pressedKey = (!isShiftPressed) ? pressedKey.toLowerCase() : pressedKey;
+        var previewString = $preview.text() + pressedKey;
+        $preview.text(previewString);
     }
     function handleInput(e) {
         if (e.which == TAB_KEY) {
@@ -22,7 +27,7 @@ define(["require", "exports", './classes/autocomplete', 'jquery'], function (req
             e.stopPropagation();
             tryAutocomplete();
         }
-        previewMessage();
+        previewMessage(e);
     }
     var TAB_KEY = 9;
     var $input = $('#read');
