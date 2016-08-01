@@ -27,12 +27,20 @@ function tryAutocomplete():void {
 
 
 function previewMessage(e):void {
-    let pressedKey: string = String.fromCharCode(e.which);
-    let isShiftPressed: boolean = e.shiftKey;
-    
-    pressedKey = (!isShiftPressed) ?  pressedKey.toLowerCase() : pressedKey
+    let previewString: string = $preview.text();
 
-    let previewString: = $preview.text() + pressedKey;
+    if (e.which == BACKSPACE) {
+      previewString = previewString.slice(0, -1);
+    } else if (e.which == DELETE) {
+      
+    } else {
+      let pressedKey: string = String.fromCharCode(e.which);
+      let isShiftPressed: boolean = e.shiftKey;
+      
+      pressedKey = (!isShiftPressed) ?  pressedKey.toLowerCase() : pressedKey
+      previewString += pressedKey;
+    }
+    
     $preview.text(previewString );
 }
 
@@ -46,6 +54,8 @@ function handleInput(e) {
     previewMessage(e);
 }
 
+const BACKSPACE = 8;
+const DELETE = 46;
 const TAB_KEY = 9;
 const $input = $('#read');
 const $preview = $('#preview');
