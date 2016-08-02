@@ -3,23 +3,17 @@ define(["require", "exports"], function (require, exports) {
     var Autocomplete = (function () {
         function Autocomplete(obj) {
             this._snippets = {
-                'pfr': 'preflop raiser'
+                'pfr': 'preflop raiser',
+                'bbb': 'bet {{50}}% bet {{75}} bet {{100}}%'
             };
             this._cursorPlacement = obj.position;
             this._position = obj.position;
             this._input = obj.input;
             this.mergeSnippets(obj.customSnippets);
         }
-        Object.defineProperty(Autocomplete.prototype, "snippets", {
+        Object.defineProperty(Autocomplete.prototype, "includesSelection", {
             get: function () {
-                return this._snippets;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Autocomplete.prototype, "cursorPlacement", {
-            get: function () {
-                return this._cursorPlacement;
+                return this._includesSelection;
             },
             enumerable: true,
             configurable: true
@@ -35,14 +29,18 @@ define(["require", "exports"], function (require, exports) {
             firstHalf = arrOfWords.join(' ');
             word = this.checkForSnippet(word);
             return (firstHalf + ' ' + word + secondHalf).trim();
-            ;
+        };
+        Autocomplete.prototype.isAvailable = function (word) {
+            return this._snippets[word] !== undefined;
+        };
+        Autocomplete.prototype.checkForSelection = function (snippet) {
+            var regEx = /\{\{.+?(?=\})\}\}/;
+            this._includesSelection = regEx.test(snippet);
         };
         Autocomplete.prototype.checkForSnippet = function (word) {
-            if (this._snippets[word] !== undefined) {
-                var oldWordLength = word.length;
+            if (this.isAvailable(word)) {
                 word = this._snippets[word];
-                var newWordLength = word.length;
-                this._cursorPlacement += newWordLength - oldWordLength;
+                this.checkForSelection(word);
             }
             return word;
         };

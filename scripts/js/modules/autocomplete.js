@@ -6,10 +6,8 @@ define(["require", "exports", '../classes/autocomplete'], function (require, exp
         var cursorPosition = inputElement.selectionStart;
         var ac = new auto.Autocomplete({ input: inputString, position: cursorPosition, customSnippets: snippets });
         var result = ac.getNewString();
-        var newCursorPosition = ac.cursorPlacement;
         input.val(result);
-        input.select();
-        inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
+        console.log(ac.includesSelection);
     }
     exports.tryAutocomplete = tryAutocomplete;
 });

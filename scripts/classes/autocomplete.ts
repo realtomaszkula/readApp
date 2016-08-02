@@ -7,9 +7,11 @@ export interface autocompleteParams {
 
 export class Autocomplete  {
   private _snippets: {} = {
-      'pfr' : 'preflop raiser'
+      'pfr' : 'preflop raiser',
+      'bbb' : 'bet {{50}}% bet {{75}} bet {{100}}%'
   }
 
+  private _includesSelection: boolean;
   private _cursorPlacement: number;
   private _input: string;
   private _position: number;
@@ -21,12 +23,8 @@ export class Autocomplete  {
     this.mergeSnippets(obj.customSnippets);
   }
 
-  get snippets () {
-      return this._snippets;
-  }
-
-  get cursorPlacement() {
-    return this._cursorPlacement;
+  get includesSelection () { 
+    return this._includesSelection; 
   }
 
   mergeSnippets(customSnippets: {} ): void{
@@ -45,17 +43,29 @@ export class Autocomplete  {
     // checking for snippet
     word = this.checkForSnippet(word);
 
-    return (firstHalf + ' ' +  word + secondHalf).trim();;
+    return (firstHalf + ' ' +  word + secondHalf).trim();
   }
 
+  isAvailable(word): boolean {
+    return this._snippets[word] !== undefined
+  }
 
+  checkForSelection(snippet): void {
+    const regEx = /\{\{.+?(?=\})\}\}/
+    this._includesSelection = regEx.test(snippet);
+  }
+    
   // if found calculating new cursor position and assigning new word
   checkForSnippet(word: string) {
-    if (this._snippets[word] !== undefined) {
-      let oldWordLength = word.length;
+    
+    if (this.isAvailable(word)) {
+
+      // replace word with snippet
       word =  this._snippets[word]
-      let newWordLength = word.length;
-      this._cursorPlacement += newWordLength - oldWordLength;
+
+      // check for selection markers
+      this.checkForSelection(word);
+
     }
     return word;
   }

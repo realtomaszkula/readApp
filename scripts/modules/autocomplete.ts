@@ -10,10 +10,9 @@ export function tryAutocomplete(input, snippets):void {
   // autocomplete class searches for snippets
   let ac = new auto.Autocomplete( {input: inputString, position: cursorPosition, customSnippets: snippets  })
   let result: string = ac.getNewString();
-  let newCursorPosition: number = ac.cursorPlacement;
 
   // printing results and placing the cursor
   input.val(result);
-  input.select();
-  inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
+  console.log(ac.includesSelection)
+  // inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
 }

@@ -13,21 +13,21 @@ define(["require", "exports", './modules/syntaxHighlighting', './modules/autocom
         $preview.html(resultString);
     }
     var customSnippets = {
-        'btn': 'button'
+        'btn': 'button',
     };
     var syntaxObj = {
         'aggressive': 'red',
         'passive': 'blue'
     };
-    var BACKSPACE = 8;
-    var DELETE = 46;
-    var TAB_KEY = 9;
-    var $input = $('#read');
-    var $preview = $('#preview');
+    var BACKSPACE = 8, DELETE = 46, TAB_KEY = 9, $input = $('#read'), $preview = $('#preview');
     function run() {
         $input.val('Lorem pfr btn sit amet');
         $input.on('keydown', handleInput);
-        $input.on('keyup', handlePreview);
+        $('button').on('click', function (e) {
+            var input = document.getElementById('read'), start = 0, end = 5;
+            input.focus();
+            input.setSelectionRange(start, end);
+        });
     }
     exports.run = run;
 });
