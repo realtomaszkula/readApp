@@ -1,42 +1,15 @@
-define(["require", "exports", './classes/autocomplete', 'jquery'], function (require, exports, auto, $) {
+define(["require", "exports", './modules/syntaxHighlighting', './modules/autocomplete', 'jquery'], function (require, exports, syntax, ac, $) {
     "use strict";
-    function tryAutocomplete() {
-        var inputString = $input.val();
-        var inputElement = document.getElementById("read");
-        var cursorPosition = inputElement.selectionStart;
-        var ac = new auto.Autocomplete({ input: inputString, position: cursorPosition, customSnippets: customSnippets });
-        var result = ac.getNewString();
-        var newCursorPosition = ac.cursorPlacement;
-        $input.val(result);
-        $input.select();
-        inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
-    }
-    function shouldNotBeHighlighted(word) {
-        syntaxObj[word] === undefined;
-    }
-    function syntaxHighlight(previewString) {
-        var previewStringArray = previewString.split(' ');
-        return previewStringArray
-            .map(function (word) {
-            if (shouldNotBeHighlighted(word)) {
-                return word;
-            }
-            else {
-                return '<span class="' + syntaxObj[word] + '">' + word + '</span>';
-            }
-        })
-            .join(' ');
-    }
     function handleInput(e) {
         if (e.which == TAB_KEY) {
             e.preventDefault();
             e.stopPropagation();
-            tryAutocomplete();
+            ac.tryAutocomplete($input, customSnippets);
         }
     }
     function handlePreview(e) {
         var previewString = $input.val();
-        var resultString = syntaxHighlight(previewString);
+        var resultString = syntax.syntaxHighlight(previewString, syntaxObj);
         $preview.html(resultString);
     }
     var customSnippets = {
