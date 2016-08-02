@@ -11,7 +11,7 @@ export class Autocomplete  {
       'bbb' : 'bet {{50}}% bet {{75}} bet {{100}}%'
   }
 
-  private _includesSelection: boolean;
+  private _includesSelection: boolean = false;
   private _input: string;
   private _position: number;
   private _resultString: string;

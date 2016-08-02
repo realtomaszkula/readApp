@@ -25,19 +25,19 @@ const
 
 let 
       selectionModeOn = false,
-      selectionModeIndexes;
+      selectionModeIndexes,
+      inputStr: string,
+      inputEl: HTMLInputElement = <HTMLInputElement>document.getElementById("read"),
+      cursorPosition: number;
 
 
-
-function autocompleteMode {
+function autocompleteMode () {
   // geting values from the DOM
-    let 
-        inputStr: string = $input.val(),
-        inputEl: HTMLInputElement = <HTMLInputElement>document.getElementById("read"),
-        cursorPosition: number = inputEl.selectionStart
+        inputStr = $input.val(),
+        cursorPosition = inputEl.selectionStart
 
         let autocomplete = a.tryAutocomplete({position: cursorPosition, customSnippets: customSnippets, input: inputStr});
-        let snippetIncludesSelection = autocomplete.selectionIndexes !== []
+        let snippetIncludesSelection = !!autocomplete.selectionIndexes.length
 
         // filling value
         $input.val(autocomplete.result);
@@ -67,7 +67,11 @@ function turnOffSelectionMode() {
 }
 
 function selectionMode() {
+    let selection = selectionModeIndexes.shift()
+    inputEl.setSelectionRange(selection.start, selection.end)
+    console.log(JSON.stringify(selectionModeIndexes));
 
+    if (!selectionModeIndexes.length) turnOffSelectionMode();
 }
 
 function handleInput(e) {
@@ -75,7 +79,6 @@ function handleInput(e) {
     if (e.which == TAB_KEY) {
         e.preventDefault(); 
         e.stopPropagation();
-
 
     !selectionModeOn ? autocompleteMode() : selectionMode()
     }
@@ -86,9 +89,6 @@ function handlePreview(e) {
   let resultString: string = syntax.syntaxHighlight(previewString, syntaxObj);
   $preview.html(resultString);
 }
-
-
-
 
 export function run() {
   $input.val('bbb');

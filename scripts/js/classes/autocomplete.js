@@ -6,6 +6,7 @@ define(["require", "exports"], function (require, exports) {
                 'pfr': 'preflop raiser',
                 'bbb': 'bet {{50}}% bet {{75}} bet {{100}}%'
             };
+            this._includesSelection = false;
             this._position = obj.position;
             this._input = obj.input;
             this.mergeSnippets(obj.customSnippets);

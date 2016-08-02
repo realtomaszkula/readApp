@@ -7,7 +7,7 @@ define(["require", "exports", '../classes/autocomplete', '../classes/selection']
         var result, selectionIndexes, finalCursorPosition;
         if (!includesSelection) {
             selectionIndexes = [];
-            finalCursorPosition = params.position + params.input.length - resultString.length;
+            finalCursorPosition = params.position + resultString.length - params.input.length;
             result = resultString;
         }
         else {

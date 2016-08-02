@@ -26,7 +26,7 @@ export function tryAutocomplete(params: a.autocompleteParams): autocompleteRetur
     selectionIndexes = [];
 
     // place cursor at the end of snippet
-    finalCursorPosition = params.position + params.input.length - resultString.length;
+    finalCursorPosition = params.position + resultString.length - params.input.length;
 
     result = resultString;
 

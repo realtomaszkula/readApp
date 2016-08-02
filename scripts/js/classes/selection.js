@@ -36,6 +36,10 @@ define(["require", "exports"], function (require, exports) {
         Selection.prototype.removeSelectionMarkers = function () {
             var replaceRegEx = /\{\{|\}\}/g;
             this._stringWithoutMarkers = this._input.replace(replaceRegEx, '');
+            this._indexes.push({
+                start: this._stringWithoutMarkers.length,
+                end: this._stringWithoutMarkers.length
+            });
         };
         return Selection;
     }());

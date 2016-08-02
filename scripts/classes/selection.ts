@@ -47,6 +47,12 @@ export class Selection {
   private removeSelectionMarkers () {
     const replaceRegEx: RegExp = /\{\{|\}\}/g;
     this._stringWithoutMarkers = this._input.replace(replaceRegEx, '');
+
+    // remove markers and add one more selection at the end of the string
+    this._indexes.push ({
+      start : this._stringWithoutMarkers.length,
+      end : this._stringWithoutMarkers.length
+    })
   }
 
 
