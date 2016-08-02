@@ -12,26 +12,32 @@ export class Autocomplete  {
   }
 
   private _includesSelection: boolean;
-  private _cursorPlacement: number;
   private _input: string;
   private _position: number;
+  private _resultString: string;
 
   constructor(obj: autocompleteParams ) {
-    this._cursorPlacement = obj.position;
     this._position = obj.position;
     this._input = obj.input;
+
+
     this.mergeSnippets(obj.customSnippets);
+    this.getNewString();
   }
 
   get includesSelection () { 
     return this._includesSelection; 
   }
 
-  mergeSnippets(customSnippets: {} ): void{
+  get resultString () {
+    return this._resultString;
+  }
+
+  private mergeSnippets(customSnippets: {} ): void{
     this._snippets = customSnippets ? Object.assign(this._snippets, customSnippets) : this._snippets;
   }
 
-  getNewString(): string {
+  private getNewString(): void {
     let firstHalf = this._input.substring(0, this._position);
     let secondHalf = this._input.substring(this._position);
 
@@ -43,21 +49,20 @@ export class Autocomplete  {
     // checking for snippet
     word = this.checkForSnippet(word);
 
-    return (firstHalf + ' ' +  word + secondHalf).trim();
+    this._resultString =  (firstHalf + ' ' +  word + secondHalf).trim();
   }
 
-  isAvailable(word): boolean {
+  private isAvailable(word): boolean {
     return this._snippets[word] !== undefined
   }
 
-  checkForSelection(snippet): void {
+  private checkForSelection(snippet): void {
     const regEx = /\{\{.+?(?=\})\}\}/
     this._includesSelection = regEx.test(snippet);
   }
     
   // if found calculating new cursor position and assigning new word
-  checkForSnippet(word: string) {
-    
+   private checkForSnippet(word: string) {
     if (this.isAvailable(word)) {
 
       // replace word with snippet

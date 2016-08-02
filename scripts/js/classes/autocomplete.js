@@ -6,14 +6,21 @@ define(["require", "exports"], function (require, exports) {
                 'pfr': 'preflop raiser',
                 'bbb': 'bet {{50}}% bet {{75}} bet {{100}}%'
             };
-            this._cursorPlacement = obj.position;
             this._position = obj.position;
             this._input = obj.input;
             this.mergeSnippets(obj.customSnippets);
+            this.getNewString();
         }
         Object.defineProperty(Autocomplete.prototype, "includesSelection", {
             get: function () {
                 return this._includesSelection;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Autocomplete.prototype, "resultString", {
+            get: function () {
+                return this._resultString;
             },
             enumerable: true,
             configurable: true
@@ -28,7 +35,7 @@ define(["require", "exports"], function (require, exports) {
             var word = arrOfWords.pop();
             firstHalf = arrOfWords.join(' ');
             word = this.checkForSnippet(word);
-            return (firstHalf + ' ' + word + secondHalf).trim();
+            this._resultString = (firstHalf + ' ' + word + secondHalf).trim();
         };
         Autocomplete.prototype.isAvailable = function (word) {
             return this._snippets[word] !== undefined;
