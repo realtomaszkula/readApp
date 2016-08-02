@@ -61,14 +61,21 @@ function autocompleteMode {
         console.log(selectionModeOn)
 }
 
+function turnOffSelectionMode() {
+    selectionModeOn = false;
+    console.log('selection mode off')
+}
+
 function selectionMode() {
 
 }
 
 function handleInput(e) {
-    if(e.which == TAB_KEY) {
+    if (e.which == ESC && selectionModeOn) turnOffSelectionMode()
+    if (e.which == TAB_KEY) {
         e.preventDefault(); 
         e.stopPropagation();
+
 
     !selectionModeOn ? autocompleteMode() : selectionMode()
     }
@@ -86,16 +93,11 @@ function handlePreview(e) {
 export function run() {
   $input.val('bbb');
   $input.on('keydown', handleInput);
-  $('button').on('click', function (e) {
-    let input  = <HTMLInputElement>document.getElementById('read'),
-        start = 0,
-        end = 5;
 
-    input.focus()
-    input.setSelectionRange(start, end);
-    input.setSelectionRange(7, 7);
+  $(document).click( function (e) {
+     if (selectionModeOn) turnOffSelectionMode()
+  })
 
-  });
 }
 
 
