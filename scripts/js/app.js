@@ -25,6 +25,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './modules/autocom
     var $input = $('#read');
     var $preview = $('#preview');
     function run() {
+        $input.val('Lorem pfr btn sit amet');
         $input.on('keydown', handleInput);
         $input.on('keyup', handlePreview);
     }

@@ -34,7 +34,7 @@ const $input = $('#read');
 const $preview = $('#preview');
 
 export function run() {
-  // $input.val('Lorem pfr btn sit amet');
+  $input.val('Lorem pfr btn sit amet');
   $input.on('keydown', handleInput);
   $input.on('keyup', handlePreview);
 }
