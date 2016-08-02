@@ -4,9 +4,6 @@ define(["require", "exports", './classes/autocomplete', 'jquery'], function (req
         var inputString = $input.val();
         var inputElement = document.getElementById("read");
         var cursorPosition = inputElement.selectionStart;
-        var customSnippets = {
-            'btn': 'button'
-        };
         var ac = new auto.Autocomplete({ input: inputString, position: cursorPosition, customSnippets: customSnippets });
         var result = ac.getNewString();
         var newCursorPosition = ac.cursorPlacement;
@@ -14,20 +11,21 @@ define(["require", "exports", './classes/autocomplete', 'jquery'], function (req
         $input.select();
         inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
     }
-    function previewMessage(e) {
-        var previewString = $preview.text();
-        if (e.which == BACKSPACE) {
-            previewString = previewString.slice(0, -1);
-        }
-        else if (e.which == DELETE) {
-        }
-        else {
-            var pressedKey = String.fromCharCode(e.which);
-            var isShiftPressed = e.shiftKey;
-            pressedKey = (!isShiftPressed) ? pressedKey.toLowerCase() : pressedKey;
-            previewString += pressedKey;
-        }
-        $preview.text(previewString);
+    function shouldNotBeHighlighted(word) {
+        syntaxObj[word] === undefined;
+    }
+    function syntaxHighlight(previewString) {
+        var previewStringArray = previewString.split(' ');
+        return previewStringArray
+            .map(function (word) {
+            if (shouldNotBeHighlighted(word)) {
+                return word;
+            }
+            else {
+                return '<span class="' + syntaxObj[word] + '">' + word + '</span>';
+            }
+        })
+            .join(' ');
     }
     function handleInput(e) {
         if (e.which == TAB_KEY) {
@@ -35,16 +33,27 @@ define(["require", "exports", './classes/autocomplete', 'jquery'], function (req
             e.stopPropagation();
             tryAutocomplete();
         }
-        previewMessage(e);
     }
+    function handlePreview(e) {
+        var previewString = $input.val();
+        var resultString = syntaxHighlight(previewString);
+        $preview.html(resultString);
+    }
+    var customSnippets = {
+        'btn': 'button'
+    };
+    var syntaxObj = {
+        'aggressive': 'red',
+        'passive': 'blue'
+    };
     var BACKSPACE = 8;
     var DELETE = 46;
     var TAB_KEY = 9;
     var $input = $('#read');
     var $preview = $('#preview');
     function run() {
-        $input.val('Lorem pfr btn sit amet');
         $input.on('keydown', handleInput);
+        $input.on('keyup', handlePreview);
     }
     exports.run = run;
 });
