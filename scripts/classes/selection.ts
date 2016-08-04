@@ -5,19 +5,26 @@ export interface indexes {
 
 export class Selection {
 
-  private _input;
   private _indexes: indexes[] = [];
-  private _stringWithoutMarkers: string;
+  private _resultString: string;
+  private _hasSelectionMarkers: boolean = false;
 
-  constructor(input:string) {
-    this._input = input;
+  constructor(private _input:string) {
     this.collectSelectionIndexes();
-    this.removeSelectionMarkers();
-    this.addMarkerAtEndOfLine();
+    if (this._hasSelectionMarkers) {
+      this.removeSelectionMarkers();
+      this.addIndexAtTheEndOfTheLine();
+    } else {
+      this._resultString = this._input
+    }
   }
 
-  get stringWithoutMarkers () {
-    return this._stringWithoutMarkers;
+  get hasSelectionMarkers () {
+    return this._hasSelectionMarkers;
+  }
+
+  get resultString () {
+    return this._resultString;
   }
 
   get selectionIndexes() {
@@ -45,30 +52,34 @@ export class Selection {
       endIndexOffset += 4;
     }
 
+    if (this._indexes !== [] ) this._hasSelectionMarkers = true
   }
 
   private removeSelectionMarkers () : void {
     const replaceRegEx: RegExp = /\{\{|\}\}/g;
-    this._stringWithoutMarkers = this._input.replace(replaceRegEx, '');
+    this._resultString = this._input.replace(replaceRegEx, '');
   }
 
-  private addMarkerAtEndOfLine () : void {
+  private addIndexAtTheEndOfTheLine () : void {
     this._indexes.push ({
-      start : this._stringWithoutMarkers.length,
-      end : this._stringWithoutMarkers.length,
+      start : this._resultString.length,
+      end : this._resultString.length,
     })
   }
 }
 
 
+
 export class SelectionIndex {
-  private _keyPressCounter:number = 0
+  private _totalKeyPressCounter: number = 0;
+  private _curentKeyPressCounter: number = 0
+  private _firstKeyPress = true;
 
   constructor ( private _indexes: indexes[] ) {}
 
   get getIndexPair (): indexes  {
-    this.correctIndexesForNumberOfClicks();
-    this.resetKeyPressCounter()
+    if (!this._firstKeyPress) this.correctIndexesForNumberOfClicks();
+    this.resetCounters()
     return this._indexes.shift();
   }
 
@@ -76,41 +87,50 @@ export class SelectionIndex {
     return this._indexes.length === 0
   }
 
-  incrementCounter(): void {
-    this._keyPressCounter++;
-    console.log(`key counter:${this._keyPressCounter}`)
+  incrementKeyPressCounter(): void {
+    this._curentKeyPressCounter++;
+    this._firstKeyPress = false;
   }
 
-  decrementCounter(): void {
-    this._keyPressCounter--;
+  decrementKeyPressCounter(): void {
+    // first backspace means erasing entire word since its selected
+    if (this._firstKeyPress) {
+      this._firstKeyPress = false;
+      this._curentKeyPressCounter -= this.currentWordLength()
+
+    } else {
+      this._curentKeyPressCounter--
+    } 
   }
 
   private correctIndexesForNumberOfClicks() : void {
+
     let  
       idx = this.currentIndexPair(),
       offset = this.calculateOffSet();
 
     idx.start += offset
     idx.end += offset
-    
-    
   }
 
   private calculateOffSet():number {
-     return (this.currentWordLength() - this._keyPressCounter) * -1
+     return (this._curentKeyPressCounter + this._totalKeyPressCounter) 
      
   }
   private currentIndexPair () : indexes {
-    return this._indexes[0];
+    return this._indexes[1];
   }
 
   private currentWordLength(): number {
-    return this._indexes[0].end - this._indexes[0].start;
+    return this._indexes[1].end - this._indexes[1].start;
   }
 
-  private resetKeyPressCounter(): void {
-    this._keyPressCounter = 0;
+  private resetCounters(): void {
+    this._totalKeyPressCounter += this._curentKeyPressCounter;
+    this._curentKeyPressCounter = 0;
+    this._firstKeyPress = true;
   }
+
 
   
 }

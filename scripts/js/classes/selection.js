@@ -6,7 +6,7 @@ define(["require", "exports"], function (require, exports) {
             this._input = input;
             this.collectSelectionIndexes();
             this.removeSelectionMarkers();
-            this.addMarkerAtEndOfLine();
+            this.addIndexAtTheEndOfTheLine();
         }
         Object.defineProperty(Selection.prototype, "stringWithoutMarkers", {
             get: function () {
@@ -39,7 +39,7 @@ define(["require", "exports"], function (require, exports) {
             var replaceRegEx = /\{\{|\}\}/g;
             this._stringWithoutMarkers = this._input.replace(replaceRegEx, '');
         };
-        Selection.prototype.addMarkerAtEndOfLine = function () {
+        Selection.prototype.addIndexAtTheEndOfTheLine = function () {
             this._indexes.push({
                 start: this._stringWithoutMarkers.length,
                 end: this._stringWithoutMarkers.length,
@@ -51,12 +51,15 @@ define(["require", "exports"], function (require, exports) {
     var SelectionIndex = (function () {
         function SelectionIndex(_indexes) {
             this._indexes = _indexes;
-            this._keyPressCounter = 0;
+            this._totalKeyPressCounter = 0;
+            this._curentKeyPressCounter = 0;
+            this._firstKeyPress = true;
         }
         Object.defineProperty(SelectionIndex.prototype, "getIndexPair", {
             get: function () {
-                this.correctIndexesForNumberOfClicks();
-                this.resetKeyPressCounter();
+                if (!this._firstKeyPress)
+                    this.correctIndexesForNumberOfClicks();
+                this.resetCounters();
                 return this._indexes.shift();
             },
             enumerable: true,
@@ -65,12 +68,18 @@ define(["require", "exports"], function (require, exports) {
         SelectionIndex.prototype.isEmpty = function () {
             return this._indexes.length === 0;
         };
-        SelectionIndex.prototype.incrementCounter = function () {
-            this._keyPressCounter++;
-            console.log("key counter:" + this._keyPressCounter);
+        SelectionIndex.prototype.incrementKeyPressCounter = function () {
+            this._curentKeyPressCounter++;
+            this._firstKeyPress = false;
         };
-        SelectionIndex.prototype.decrementCounter = function () {
-            this._keyPressCounter--;
+        SelectionIndex.prototype.decrementKeyPressCounter = function () {
+            if (this._firstKeyPress) {
+                this._firstKeyPress = false;
+                this._curentKeyPressCounter -= this.currentWordLength();
+            }
+            else {
+                this._curentKeyPressCounter--;
+            }
         };
         SelectionIndex.prototype.correctIndexesForNumberOfClicks = function () {
             var idx = this.currentIndexPair(), offset = this.calculateOffSet();
@@ -78,16 +87,18 @@ define(["require", "exports"], function (require, exports) {
             idx.end += offset;
         };
         SelectionIndex.prototype.calculateOffSet = function () {
-            return (this.currentWordLength() - this._keyPressCounter) * -1;
+            return (this._curentKeyPressCounter + this._totalKeyPressCounter);
         };
         SelectionIndex.prototype.currentIndexPair = function () {
-            return this._indexes[0];
+            return this._indexes[1];
         };
         SelectionIndex.prototype.currentWordLength = function () {
-            return this._indexes[0].end - this._indexes[0].start;
+            return this._indexes[1].end - this._indexes[1].start;
         };
-        SelectionIndex.prototype.resetKeyPressCounter = function () {
-            this._keyPressCounter = 0;
+        SelectionIndex.prototype.resetCounters = function () {
+            this._totalKeyPressCounter += this._curentKeyPressCounter;
+            this._curentKeyPressCounter = 0;
+            this._firstKeyPress = true;
         };
         return SelectionIndex;
     }());

@@ -4,7 +4,7 @@ define(["require", "exports"], function (require, exports) {
         function Autocomplete(obj) {
             this._snippets = {
                 'pfr': 'preflop raiser',
-                'bbb': 'bet {{50}}% bet {{75}} bet {{100}}%'
+                'bbb': 'bet {{25}}% bet {{152}} bet {{64}}%'
             };
             this._includesSelection = false;
             this._position = obj.position;

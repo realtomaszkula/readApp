@@ -27,29 +27,38 @@ define(["require", "exports", './modules/syntaxHighlighting', './modules/autocom
         else {
             inputEl.setSelectionRange(autocomplete.cursorPosition, autocomplete.cursorPosition);
         }
-        console.log(selectionModeOn);
     }
     function turnOffSelectionMode() {
         selectionModeOn = false;
         console.log('selection mode off');
     }
     function selectionMode() {
-        var selection = selectionModeIndexes.getIndexPair;
-        inputEl.setSelectionRange(selection.start, selection.end);
-        if (selectionModeIndexes.isEmpty)
+        if (selectionModeIndexes.isEmpty()) {
             turnOffSelectionMode();
+        }
+        var selection = selectionModeIndexes.getIndexPair;
+        console.log(selection);
+        inputEl.setSelectionRange(selection.start, selection.end);
     }
     function handleInput(e) {
-        if (e.which == ESC && selectionModeOn)
+        var currentKey = e.which;
+        if (currentKey == ESC && selectionModeOn)
             turnOffSelectionMode();
-        if (e.which == TAB_KEY) {
+        if (currentKey == TAB_KEY) {
             e.preventDefault();
             e.stopPropagation();
             !selectionModeOn ? autocompleteMode() : selectionMode();
         }
-        if (selectionModeOn && e.which != TAB_KEY) {
-            selectionModeIndexes.incrementCounter();
+        if (selectionModeOn && currentKey != TAB_KEY) {
+            selectionModeIndexes;
+            if (currentKey === BACKSPACE) {
+                selectionModeIndexes.decrementKeyPressCounter();
+            }
+            else {
+                selectionModeIndexes.incrementKeyPressCounter();
+            }
         }
+        console.log(selectionModeIndexes);
     }
     function handlePreview(e) {
         var previewString = $input.val();

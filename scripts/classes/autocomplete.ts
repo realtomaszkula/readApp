@@ -8,7 +8,7 @@ export interface autocompleteParams {
 export class Autocomplete  {
   private _snippets: {} = {
       'pfr' : 'preflop raiser',
-      'bbb' : 'bet {{50}}% bet {{75}} bet {{100}}%'
+      'bbb' : 'bet {{25}}% bet {{152}} bet {{64}}%'
   }
 
   private _includesSelection: boolean = false;
@@ -55,21 +55,13 @@ export class Autocomplete  {
   private isAvailable(word): boolean {
     return this._snippets[word] !== undefined
   }
-
-  private checkForSelection(snippet): void {
-    const regEx = /\{\{.+?(?=\})\}\}/
-    this._includesSelection = regEx.test(snippet);
-  }
-    
+   
   // if found calculating new cursor position and assigning new word
    private checkForSnippet(word: string) {
     if (this.isAvailable(word)) {
 
       // replace word with snippet
       word =  this._snippets[word]
-
-      // check for selection markers
-      this.checkForSelection(word);
 
     }
     return word;

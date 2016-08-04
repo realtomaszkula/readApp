@@ -4,7 +4,7 @@
 /// <reference path="./modules/autocomplete.ts" />
 
 import syntax = require('./modules/syntaxHighlighting')
-import a = require('./modules/autocomplete')
+import a = require('./classes/autocomplete')
 import s = require('./classes/selection')
 import * as $ from 'jquery'
 
@@ -38,30 +38,27 @@ function autocompleteMode () {
         inputStr = $input.val(),
         cursorPosition = inputEl.selectionStart
 
-        let autocomplete = a.tryAutocomplete({position: cursorPosition, customSnippets: customSnippets, input: inputStr});
-        let snippetIncludesSelection = !!autocomplete.selectionIndexes.length
+        let autocomplete = new a.Autocomplete
+            ({customSnippets: customSnippets, input: inputStr, position: cursorPosition})
+            .resultString
+            
+        let selection = new s.Selection(autocomplete);
 
         // filling value
-        $input.val(autocomplete.result);
+        $input.val(selection.resultString);
 
-        // selecting marker or placing cursor
-        if (snippetIncludesSelection) {
-          // selecting first marker
-          let selection = autocomplete.selectionIndexes.shift()
-          inputEl.setSelectionRange(selection.start, selection.end)
-
-          // if there are indexes left, go into selection mode in which tab doesn't look for snippets, but instead jumps to next index
-          if (snippetIncludesSelection)  {
-            selectionModeOn = true;
-            let indexes = autocomplete.selectionIndexes;
-            selectionModeIndexes = new s.SelectionIndex(indexes);
-          }
+        // entering selection mode or finishing with placing cursor at EOL
+        if (selection.hasSelectionMarkers) {
+          selectionModeIndexes = new s.SelectionIndex(selection.selectionIndexes)
+          let idxPair = selectionModeIndexes.getIndexPair
+          
+          selectInputRange(idxPair)
+          selectionModeOn = true;
         } else {
-          // placing cursor
-          inputEl.setSelectionRange(autocomplete.cursorPosition, autocomplete.cursorPosition)
+          // placing cursor at the end of the line
+          let inputLength = $input.val().length
+          inputEl.setSelectionRange(inputLength, inputLength)
         }
-
-        console.log(selectionModeOn)
 }
 
 function turnOffSelectionMode() {
@@ -69,29 +66,44 @@ function turnOffSelectionMode() {
     console.log('selection mode off')
 }
 
+function selectInputRange(selection: s.indexes) {
+  inputEl.setSelectionRange(selection.start, selection.end)
+}
+
 function selectionMode() {
-    let selection = selectionModeIndexes.getIndexPair
-    inputEl.setSelectionRange(selection.start, selection.end)
+    if (selectionModeIndexes.isEmpty()) {
+      turnOffSelectionMode();
+    }
 
-    // console.log(JSON.stringify(selectionModeIndexes));
-    // console.log(selectionModeIndexes[0].wordLength());
-
-    if (selectionModeIndexes.isEmpty) turnOffSelectionMode();
+    let idxPair = selectionModeIndexes.getIndexPair
+    selectInputRange(idxPair)
 }
 
 function handleInput(e) {
+    let currentKey = e.which;
+
+    if (currentKey == ESC && selectionModeOn) turnOffSelectionMode()
+    if (currentKey == TAB_KEY) {
+      e.preventDefault(); 
+      e.stopPropagation();
+      !selectionModeOn ? autocompleteMode() : selectionMode()
+    }
+
+    if (selectionModeOn && currentKey != TAB_KEY) {
+      selectionModeIndexes
+
+      // calculate offset for selection indexes
+       if (currentKey === BACKSPACE)  {
+        // each backspace keypress decrements keypress counter
+        selectionModeIndexes.decrementKeyPressCounter();
+       } else {
+        // each regular keypress increments keypress counter 
+        selectionModeIndexes.incrementKeyPressCounter();
+       }
+    }
+    console.log(selectionModeIndexes)
+
     
-    if (e.which == ESC && selectionModeOn) turnOffSelectionMode()
-    if (e.which == TAB_KEY) {
-        e.preventDefault(); 
-        e.stopPropagation();
-
-    !selectionModeOn ? autocompleteMode() : selectionMode()
-    }
-
-    if (selectionModeOn && e.which != TAB_KEY) {
-      selectionModeIndexes.incrementCounter();
-    }
 }
 
 function handlePreview(e) {
