@@ -36,11 +36,11 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         inputEl.setSelectionRange(selection.start, selection.end);
     }
     function selectionMode() {
+        var idxPair = selectionModeIndexes.getIndexPair;
+        selectInputRange(idxPair);
         if (selectionModeIndexes.isEmpty()) {
             turnOffSelectionMode();
         }
-        var idxPair = selectionModeIndexes.getIndexPair;
-        selectInputRange(idxPair);
     }
     function handleInput(e) {
         var currentKey = e.which;

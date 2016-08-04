@@ -72,12 +72,13 @@ function selectInputRange(selection: s.indexes) {
 }
 
 function selectionMode() {
-    if (selectionModeIndexes.isEmpty()) {
-      turnOffSelectionMode();
-    }
 
     let idxPair = selectionModeIndexes.getIndexPair
     selectInputRange(idxPair)
+
+    if (selectionModeIndexes.isEmpty()) {
+      turnOffSelectionMode();
+    }
 }
 
 function handleInput(e) {
@@ -99,9 +100,10 @@ function handleInput(e) {
         selectionModeIndexes.KeyPressCounter('decrement');
        } else {
         // each regular keypress increments keypress counter 
-        selectionModeIndexes.KeyPressCounter( 'increment');
+        selectionModeIndexes.KeyPressCounter('increment');
        }
- 
+    
+
     }
 
     

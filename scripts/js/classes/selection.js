@@ -85,14 +85,22 @@ define(["require", "exports"], function (require, exports) {
         };
         SelectionIndex.prototype.KeyPressCounter = function (changeType) {
             if (changeType === 'increment') {
-                console.log('incrementing');
+                if (this._firstKeyPress) {
+                    this._curentKeyPressCounter -= this.currentWordLength();
+                }
+                this._curentKeyPressCounter++;
             }
             if (changeType === 'decrement') {
-                console.log('decrementing');
+                if (this._firstKeyPress) {
+                    this._curentKeyPressCounter -= this.currentWordLength();
+                }
+                else {
+                    this._curentKeyPressCounter--;
+                }
             }
+            this._firstKeyPress = false;
         };
         SelectionIndex.prototype.correctIndexesForNumberOfClicks = function () {
-            debugger;
             var idx = this.currentIndexPair(), offset = this.calculateOffSet();
             idx.start += offset;
             idx.end += offset;

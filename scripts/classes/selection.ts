@@ -68,8 +68,6 @@ export class Selection {
   }
 }
 
-
-
 export class SelectionIndex {
   private _totalKeyPressCounter: number = 0;
   private _curentKeyPressCounter: number = 0
@@ -89,19 +87,22 @@ export class SelectionIndex {
 
   KeyPressCounter(changeType: 'increment' | 'decrement' ) {
     if (changeType === 'increment') {
-      console.log('incrementing');
-    } 
-    
+      if (this._firstKeyPress) {
+        this._curentKeyPressCounter -= this.currentWordLength()
+      }
+      this._curentKeyPressCounter++
+    }     
     if (changeType === 'decrement') {
-      console.log('decrementing');
+      if (this._firstKeyPress) {
+        this._curentKeyPressCounter -= this.currentWordLength()
+      } else {
+        this._curentKeyPressCounter--
+      }
     }
-
-
+    this._firstKeyPress = false;
   }
 
   private correctIndexesForNumberOfClicks() : void {
-
-    debugger
     let  
       idx = this.currentIndexPair(),
       offset = this.calculateOffSet();
