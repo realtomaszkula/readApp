@@ -4,21 +4,13 @@ define(["require", "exports"], function (require, exports) {
         function Autocomplete(obj) {
             this._snippets = {
                 'pfr': 'preflop raiser',
-                'bbb': 'bet {{25}}% bet {{152}} bet {{64}}%'
+                'bbb': 'bet {{25}}% bet {{25}}% bet {{64}}%'
             };
-            this._includesSelection = false;
             this._position = obj.position;
             this._input = obj.input;
             this.mergeSnippets(obj.customSnippets);
             this.getNewString();
         }
-        Object.defineProperty(Autocomplete.prototype, "includesSelection", {
-            get: function () {
-                return this._includesSelection;
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(Autocomplete.prototype, "resultString", {
             get: function () {
                 return this._resultString;
@@ -41,14 +33,9 @@ define(["require", "exports"], function (require, exports) {
         Autocomplete.prototype.isAvailable = function (word) {
             return this._snippets[word] !== undefined;
         };
-        Autocomplete.prototype.checkForSelection = function (snippet) {
-            var regEx = /\{\{.+?(?=\})\}\}/;
-            this._includesSelection = regEx.test(snippet);
-        };
         Autocomplete.prototype.checkForSnippet = function (word) {
             if (this.isAvailable(word)) {
                 word = this._snippets[word];
-                this.checkForSelection(word);
             }
             return word;
         };

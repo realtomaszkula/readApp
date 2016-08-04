@@ -87,42 +87,40 @@ export class SelectionIndex {
     return this._indexes.length === 0
   }
 
-  incrementKeyPressCounter(): void {
-    this._curentKeyPressCounter++;
-    this._firstKeyPress = false;
-  }
-
-  decrementKeyPressCounter(): void {
-    // first backspace means erasing entire word since its selected
-    if (this._firstKeyPress) {
-      this._firstKeyPress = false;
-      this._curentKeyPressCounter -= this.currentWordLength()
-
-    } else {
-      this._curentKeyPressCounter--
+  KeyPressCounter(changeType: 'increment' | 'decrement' ) {
+    if (changeType === 'increment') {
+      console.log('incrementing');
     } 
+    
+    if (changeType === 'decrement') {
+      console.log('decrementing');
+    }
+
+
   }
 
   private correctIndexesForNumberOfClicks() : void {
 
+    debugger
     let  
       idx = this.currentIndexPair(),
       offset = this.calculateOffSet();
 
     idx.start += offset
     idx.end += offset
+
   }
 
   private calculateOffSet():number {
-     return (this._curentKeyPressCounter + this._totalKeyPressCounter) 
+     return this._curentKeyPressCounter + this._totalKeyPressCounter
      
   }
   private currentIndexPair () : indexes {
-    return this._indexes[1];
+    return this._indexes[0];
   }
 
   private currentWordLength(): number {
-    return this._indexes[1].end - this._indexes[1].start;
+    return this._indexes[0].end - this._indexes[0].start;
   }
 
   private resetCounters(): void {

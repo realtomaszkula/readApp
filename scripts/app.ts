@@ -1,7 +1,6 @@
 /// <reference path="../typings/jquery.d.ts" />
 /// <reference path="./classes/autocomplete.ts" />
 /// <reference path="./classes/selection.ts" />
-/// <reference path="./modules/autocomplete.ts" />
 
 import syntax = require('./modules/syntaxHighlighting')
 import a = require('./classes/autocomplete')
@@ -50,9 +49,11 @@ function autocompleteMode () {
         // entering selection mode or finishing with placing cursor at EOL
         if (selection.hasSelectionMarkers) {
           selectionModeIndexes = new s.SelectionIndex(selection.selectionIndexes)
+          console.log(selectionModeIndexes)
+
           let idxPair = selectionModeIndexes.getIndexPair
-          
           selectInputRange(idxPair)
+
           selectionModeOn = true;
         } else {
           // placing cursor at the end of the line
@@ -95,13 +96,13 @@ function handleInput(e) {
       // calculate offset for selection indexes
        if (currentKey === BACKSPACE)  {
         // each backspace keypress decrements keypress counter
-        selectionModeIndexes.decrementKeyPressCounter();
+        selectionModeIndexes.KeyPressCounter('decrement');
        } else {
         // each regular keypress increments keypress counter 
-        selectionModeIndexes.incrementKeyPressCounter();
+        selectionModeIndexes.KeyPressCounter( 'increment');
        }
+ 
     }
-    console.log(selectionModeIndexes)
 
     
 }

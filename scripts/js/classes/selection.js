@@ -1,16 +1,29 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
     var Selection = (function () {
-        function Selection(input) {
+        function Selection(_input) {
+            this._input = _input;
             this._indexes = [];
-            this._input = input;
+            this._hasSelectionMarkers = false;
             this.collectSelectionIndexes();
-            this.removeSelectionMarkers();
-            this.addIndexAtTheEndOfTheLine();
+            if (this._hasSelectionMarkers) {
+                this.removeSelectionMarkers();
+                this.addIndexAtTheEndOfTheLine();
+            }
+            else {
+                this._resultString = this._input;
+            }
         }
-        Object.defineProperty(Selection.prototype, "stringWithoutMarkers", {
+        Object.defineProperty(Selection.prototype, "hasSelectionMarkers", {
             get: function () {
-                return this._stringWithoutMarkers;
+                return this._hasSelectionMarkers;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Selection.prototype, "resultString", {
+            get: function () {
+                return this._resultString;
             },
             enumerable: true,
             configurable: true
@@ -34,15 +47,17 @@ define(["require", "exports"], function (require, exports) {
                 startIndexOffset += 4;
                 endIndexOffset += 4;
             }
+            if (this._indexes !== [])
+                this._hasSelectionMarkers = true;
         };
         Selection.prototype.removeSelectionMarkers = function () {
             var replaceRegEx = /\{\{|\}\}/g;
-            this._stringWithoutMarkers = this._input.replace(replaceRegEx, '');
+            this._resultString = this._input.replace(replaceRegEx, '');
         };
         Selection.prototype.addIndexAtTheEndOfTheLine = function () {
             this._indexes.push({
-                start: this._stringWithoutMarkers.length,
-                end: this._stringWithoutMarkers.length,
+                start: this._resultString.length,
+                end: this._resultString.length,
             });
         };
         return Selection;
@@ -68,32 +83,28 @@ define(["require", "exports"], function (require, exports) {
         SelectionIndex.prototype.isEmpty = function () {
             return this._indexes.length === 0;
         };
-        SelectionIndex.prototype.incrementKeyPressCounter = function () {
-            this._curentKeyPressCounter++;
-            this._firstKeyPress = false;
-        };
-        SelectionIndex.prototype.decrementKeyPressCounter = function () {
-            if (this._firstKeyPress) {
-                this._firstKeyPress = false;
-                this._curentKeyPressCounter -= this.currentWordLength();
+        SelectionIndex.prototype.KeyPressCounter = function (changeType) {
+            if (changeType === 'increment') {
+                console.log('incrementing');
             }
-            else {
-                this._curentKeyPressCounter--;
+            if (changeType === 'decrement') {
+                console.log('decrementing');
             }
         };
         SelectionIndex.prototype.correctIndexesForNumberOfClicks = function () {
+            debugger;
             var idx = this.currentIndexPair(), offset = this.calculateOffSet();
             idx.start += offset;
             idx.end += offset;
         };
         SelectionIndex.prototype.calculateOffSet = function () {
-            return (this._curentKeyPressCounter + this._totalKeyPressCounter);
+            return this._curentKeyPressCounter + this._totalKeyPressCounter;
         };
         SelectionIndex.prototype.currentIndexPair = function () {
-            return this._indexes[1];
+            return this._indexes[0];
         };
         SelectionIndex.prototype.currentWordLength = function () {
-            return this._indexes[1].end - this._indexes[1].start;
+            return this._indexes[0].end - this._indexes[0].start;
         };
         SelectionIndex.prototype.resetCounters = function () {
             this._totalKeyPressCounter += this._curentKeyPressCounter;

@@ -8,10 +8,9 @@ export interface autocompleteParams {
 export class Autocomplete  {
   private _snippets: {} = {
       'pfr' : 'preflop raiser',
-      'bbb' : 'bet {{25}}% bet {{152}} bet {{64}}%'
+      'bbb' : 'bet {{25}}% bet {{25}}% bet {{64}}%'
   }
 
-  private _includesSelection: boolean = false;
   private _input: string;
   private _position: number;
   private _resultString: string;
@@ -23,10 +22,6 @@ export class Autocomplete  {
 
     this.mergeSnippets(obj.customSnippets);
     this.getNewString();
-  }
-
-  get includesSelection () { 
-    return this._includesSelection; 
   }
 
   get resultString () {
