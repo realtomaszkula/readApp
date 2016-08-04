@@ -1,9 +1,11 @@
 /// <reference path="../typings/jquery.d.ts" />
 /// <reference path="./classes/autocomplete.ts" />
+/// <reference path="./classes/selection.ts" />
 /// <reference path="./modules/autocomplete.ts" />
 
 import syntax = require('./modules/syntaxHighlighting')
 import a = require('./modules/autocomplete')
+import s = require('./classes/selection')
 import * as $ from 'jquery'
 
 const customSnippets  = {
@@ -25,7 +27,7 @@ const
 
 let 
       selectionModeOn = false,
-      selectionModeIndexes,
+      selectionModeIndexes: s.SelectionIndex,
       inputStr: string,
       inputEl: HTMLInputElement = <HTMLInputElement>document.getElementById("read"),
       cursorPosition: number;
@@ -51,7 +53,8 @@ function autocompleteMode () {
           // if there are indexes left, go into selection mode in which tab doesn't look for snippets, but instead jumps to next index
           if (snippetIncludesSelection)  {
             selectionModeOn = true;
-            selectionModeIndexes = autocomplete.selectionIndexes;
+            let indexes = autocomplete.selectionIndexes;
+            selectionModeIndexes = new s.SelectionIndex(indexes);
           }
         } else {
           // placing cursor
@@ -67,20 +70,27 @@ function turnOffSelectionMode() {
 }
 
 function selectionMode() {
-    let selection = selectionModeIndexes.shift()
+    let selection = selectionModeIndexes.getIndexPair
     inputEl.setSelectionRange(selection.start, selection.end)
-    console.log(JSON.stringify(selectionModeIndexes));
 
-    if (!selectionModeIndexes.length) turnOffSelectionMode();
+    // console.log(JSON.stringify(selectionModeIndexes));
+    // console.log(selectionModeIndexes[0].wordLength());
+
+    if (selectionModeIndexes.isEmpty) turnOffSelectionMode();
 }
 
 function handleInput(e) {
+    
     if (e.which == ESC && selectionModeOn) turnOffSelectionMode()
     if (e.which == TAB_KEY) {
         e.preventDefault(); 
         e.stopPropagation();
 
     !selectionModeOn ? autocompleteMode() : selectionMode()
+    }
+
+    if (selectionModeOn && e.which != TAB_KEY) {
+      selectionModeIndexes.incrementCounter();
     }
 }
 

@@ -1,6 +1,6 @@
 export interface indexes {
   start: number,
-  end: number
+  end: number,
 }
 
 export class Selection {
@@ -13,6 +13,7 @@ export class Selection {
     this._input = input;
     this.collectSelectionIndexes();
     this.removeSelectionMarkers();
+    this.addMarkerAtEndOfLine();
   }
 
   get stringWithoutMarkers () {
@@ -33,10 +34,12 @@ export class Selection {
         end: number;
     
     while ( result = selectionRegEx.exec(this._input) ) {
-      this._indexes.push ({
+      let obj = {
         start :  result.index - startIndexOffset,
-        end : selectionRegEx.lastIndex - endIndexOffset
-      })
+        end : selectionRegEx.lastIndex - endIndexOffset,
+      }
+      
+      this._indexes.push (obj)
 
       startIndexOffset += 4;
       endIndexOffset += 4;
@@ -44,17 +47,71 @@ export class Selection {
 
   }
 
-  private removeSelectionMarkers () {
+  private removeSelectionMarkers () : void {
     const replaceRegEx: RegExp = /\{\{|\}\}/g;
     this._stringWithoutMarkers = this._input.replace(replaceRegEx, '');
-
-    // remove markers and add one more selection at the end of the string
-    this._indexes.push ({
-      start : this._stringWithoutMarkers.length,
-      end : this._stringWithoutMarkers.length
-    })
   }
 
-
-
+  private addMarkerAtEndOfLine () : void {
+    this._indexes.push ({
+      start : this._stringWithoutMarkers.length,
+      end : this._stringWithoutMarkers.length,
+    })
+  }
 }
+
+
+export class SelectionIndex {
+  private _keyPressCounter:number = 0
+
+  constructor ( private _indexes: indexes[] ) {}
+
+  get getIndexPair (): indexes  {
+    this.correctIndexesForNumberOfClicks();
+    this.resetKeyPressCounter()
+    return this._indexes.shift();
+  }
+
+  isEmpty(): boolean {
+    return this._indexes.length === 0
+  }
+
+  incrementCounter(): void {
+    this._keyPressCounter++;
+    console.log(`key counter:${this._keyPressCounter}`)
+  }
+
+  decrementCounter(): void {
+    this._keyPressCounter--;
+  }
+
+  private correctIndexesForNumberOfClicks() : void {
+    let  
+      idx = this.currentIndexPair(),
+      offset = this.calculateOffSet();
+
+    idx.start += offset
+    idx.end += offset
+    
+    
+  }
+
+  private calculateOffSet():number {
+     return (this.currentWordLength() - this._keyPressCounter) * -1
+     
+  }
+  private currentIndexPair () : indexes {
+    return this._indexes[0];
+  }
+
+  private currentWordLength(): number {
+    return this._indexes[0].end - this._indexes[0].start;
+  }
+
+  private resetKeyPressCounter(): void {
+    this._keyPressCounter = 0;
+  }
+
+  
+}
+

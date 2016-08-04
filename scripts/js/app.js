@@ -1,4 +1,4 @@
-define(["require", "exports", './modules/syntaxHighlighting', './modules/autocomplete', 'jquery'], function (require, exports, syntax, a, $) {
+define(["require", "exports", './modules/syntaxHighlighting', './modules/autocomplete', './classes/selection', 'jquery'], function (require, exports, syntax, a, s, $) {
     "use strict";
     var customSnippets = {
         'btn': 'button',
@@ -20,7 +20,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './modules/autocom
             inputEl.setSelectionRange(selection.start, selection.end);
             if (snippetIncludesSelection) {
                 selectionModeOn = true;
-                selectionModeIndexes = autocomplete.selectionIndexes;
+                var indexes = autocomplete.selectionIndexes;
+                selectionModeIndexes = new s.SelectionIndex(indexes);
             }
         }
         else {
@@ -33,10 +34,9 @@ define(["require", "exports", './modules/syntaxHighlighting', './modules/autocom
         console.log('selection mode off');
     }
     function selectionMode() {
-        var selection = selectionModeIndexes.shift();
+        var selection = selectionModeIndexes.getIndexPair;
         inputEl.setSelectionRange(selection.start, selection.end);
-        console.log(JSON.stringify(selectionModeIndexes));
-        if (!selectionModeIndexes.length)
+        if (selectionModeIndexes.isEmpty)
             turnOffSelectionMode();
     }
     function handleInput(e) {
@@ -46,6 +46,9 @@ define(["require", "exports", './modules/syntaxHighlighting', './modules/autocom
             e.preventDefault();
             e.stopPropagation();
             !selectionModeOn ? autocompleteMode() : selectionMode();
+        }
+        if (selectionModeOn && e.which != TAB_KEY) {
+            selectionModeIndexes.incrementCounter();
         }
     }
     function handlePreview(e) {
