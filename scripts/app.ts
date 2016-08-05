@@ -64,7 +64,6 @@ function setCurrentInputValues(){
 
 function autocompleteMode () {
     setCurrentInputValues();
-
     let autocomplete = new a.Autocomplete
         ({customSnippets: customSnippets, input: inputStr, position: cursorPosition})
         .resultString
@@ -121,7 +120,6 @@ function clearSuggestionList() {
   }
 }
 
-
 function navigateSuggestionsMenu(currentKey) {
   currentKey == DOWN ? selectNextInTheList() : selectPrevInTheList()
 }
@@ -144,10 +142,6 @@ function initializeIntelisenseMode() {
     createSuggetstionList(suggestions);
 }
 
-function intelisenseMode() {
-  selectNextInTheList();
-}
-
 function replaceLastWord(input:string, replacement:string) :string  {
   let arrOfWords = input.split(' ');
   arrOfWords.pop()
@@ -155,16 +149,17 @@ function replaceLastWord(input:string, replacement:string) :string  {
   return arrOfWords.join(' ')
 }
 
-function triggerCurrentSnippet() {
+function paseSuggetionWordIntoInput() {
   let suggestion = $('li.active').data('suggestion');
   setCurrentInputValues();
   let result = replaceLastWord(inputStr, suggestion);
   $input.val(result);
+}
+
+function triggerCurrentSnippet() {
+  paseSuggetionWordIntoInput();
   turnOffIntelisenseMode();
   autocompleteMode();
-
-
-
 }
 
 function handleInput(e) {
@@ -175,45 +170,48 @@ function handleInput(e) {
       turnOffIntelisenseMode()
     }
 
-    if (selectionModeOn && currentKey != TAB) {
-      selectionModeIndexes
-
-      // calculate offset for selection indexes
-       if (currentKey === BACKSPACE)  {
-        // each backspace keypress decrements keypress counter
-        selectionModeIndexes.KeyPressCounter('decrement');
-       } else {
-        // each regular keypress increments keypress counter 
-        selectionModeIndexes.KeyPressCounter('increment');
-       }
-    }
-
     if (e.ctrlKey && currentKey == SPACE ) {
         initializeIntelisenseMode()
     }
 
-    // IMPORTANT => position of intelisense matter, refactor later
-
+    // INTELISENSE
     if(intelisenseModeOn) {
+
       if (currentKey == UP ||  currentKey == DOWN) {
         navigateSuggestionsMenu(currentKey);
       }
-    }
 
-    if (currentKey == TAB) {
-      e.preventDefault(); 
-      e.stopPropagation();
-
-      if (selectionModeOn) {
-        selectionMode()
-      } else if (intelisenseModeOn) {
-          e.preventDefault(); 
-          e.stopPropagation();
-          triggerCurrentSnippet()
-      } else {
-        autocompleteMode()
+      if (currentKey == BACKSPACE) {
+        turnOffIntelisenseMode();
       }
+
+      if (currentKey == TAB || currentKey == ENTER) {
+        e.preventDefault();
+        triggerCurrentSnippet()
+      }
+
     }
+
+    // SELECTION MODE
+   else if(selectionModeOn) {
+      if (currentKey == TAB) {
+        e.preventDefault();
+        selectionMode()
+      }
+      // calculate offset for selection indexes
+      else if (currentKey === BACKSPACE)  {
+        selectionModeIndexes.KeyPressCounter('decrement');
+      } 
+      else {
+        selectionModeIndexes.KeyPressCounter('increment');
+      }
+  
+    }
+
+    else if (currentKey == TAB) {
+          e.preventDefault();
+          autocompleteMode()
+      }
 
 
     

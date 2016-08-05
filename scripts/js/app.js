@@ -88,20 +88,20 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         let suggestions = intelisense.suggestions;
         createSuggetstionList(suggestions);
     }
-    function intelisenseMode() {
-        selectNextInTheList();
-    }
     function replaceLastWord(input, replacement) {
         let arrOfWords = input.split(' ');
         arrOfWords.pop();
         arrOfWords.push(replacement);
         return arrOfWords.join(' ');
     }
-    function triggerCurrentSnippet() {
+    function paseSuggetionWordIntoInput() {
         let suggestion = $('li.active').data('suggestion');
         setCurrentInputValues();
         let result = replaceLastWord(inputStr, suggestion);
         $input.val(result);
+    }
+    function triggerCurrentSnippet() {
+        paseSuggetionWordIntoInput();
         turnOffIntelisenseMode();
         autocompleteMode();
     }
@@ -111,15 +111,6 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             turnOffSelectionMode();
             turnOffIntelisenseMode();
         }
-        if (selectionModeOn && currentKey != TAB) {
-            selectionModeIndexes;
-            if (currentKey === BACKSPACE) {
-                selectionModeIndexes.KeyPressCounter('decrement');
-            }
-            else {
-                selectionModeIndexes.KeyPressCounter('increment');
-            }
-        }
         if (e.ctrlKey && currentKey == SPACE) {
             initializeIntelisenseMode();
         }
@@ -127,21 +118,29 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             if (currentKey == UP || currentKey == DOWN) {
                 navigateSuggestionsMenu(currentKey);
             }
-        }
-        if (currentKey == TAB) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (selectionModeOn) {
-                selectionMode();
+            if (currentKey == BACKSPACE) {
+                turnOffIntelisenseMode();
             }
-            else if (intelisenseModeOn) {
+            if (currentKey == TAB || currentKey == ENTER) {
                 e.preventDefault();
-                e.stopPropagation();
                 triggerCurrentSnippet();
             }
-            else {
-                autocompleteMode();
+        }
+        else if (selectionModeOn) {
+            if (currentKey == TAB) {
+                e.preventDefault();
+                selectionMode();
             }
+            else if (currentKey === BACKSPACE) {
+                selectionModeIndexes.KeyPressCounter('decrement');
+            }
+            else {
+                selectionModeIndexes.KeyPressCounter('increment');
+            }
+        }
+        else if (currentKey == TAB) {
+            e.preventDefault();
+            autocompleteMode();
         }
     }
     function handlePreview(e) {
