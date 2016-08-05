@@ -1,7 +1,11 @@
-define(["require", "exports", './modules/syntaxHighlighting', './classes/autocomplete', './classes/selection', 'jquery'], function (require, exports, syntax, a, s, $) {
+define(["require", "exports", './modules/syntaxHighlighting', './classes/autocomplete', './classes/selection', './classes/intelisense', 'jquery'], function (require, exports, syntax, a, s, inteli, $) {
     "use strict";
     var customSnippets = {
         'btn': 'button',
+        'pfr': 'preflop raiser',
+        'xrb': 'checkraise flop {{pot}} to bet the turn {{size}}',
+        'bbb': 'bet {{25}}% bet {{25}}% bet {{64}}%',
+        'bxb': 'bet {{25}}% bet {{25}}% bet {{64}}%'
     };
     var syntaxObj = {
         'aggressive': 'red',
@@ -44,8 +48,13 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
     }
     function handleInput(e) {
         var currentKey = e.which;
-        if (e.ctrlKey && currentKey == SPACE)
-            console.log("triggered autocomplete");
+        if (e.ctrlKey && currentKey == SPACE) {
+            inputStr = $input.val(),
+                cursorPosition = inputEl.selectionStart;
+            var intelisense = new inteli.intelisense({ input: inputStr, position: cursorPosition, customSnippets: customSnippets });
+            var suggestions = intelisense.suggestions;
+            console.log(suggestions);
+        }
         if (currentKey == ESC && selectionModeOn)
             turnOffSelectionMode();
         if (currentKey == TAB_KEY) {

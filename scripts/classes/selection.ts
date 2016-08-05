@@ -1,11 +1,8 @@
-export interface indexes {
-  start: number,
-  end: number,
-}
+import i = require('../interfaces/interfaces')
 
 export class Selection {
 
-  private _indexes: indexes[] = [];
+  private _indexes: i.indexes[] = [];
   private _resultString: string;
   private _hasSelectionMarkers: boolean = false;
 
@@ -73,9 +70,9 @@ export class SelectionIndex {
   private _curentKeyPressCounter: number = 0
   private _firstKeyPress = true;
 
-  constructor ( private _indexes: indexes[] ) {}
+  constructor ( private _indexes: i.indexes[] ) {}
 
-  get getIndexPair (): indexes  {
+  get getIndexPair (): i.indexes  {
     if (!this._firstKeyPress) this.correctIndexesForNumberOfClicks();
     this.resetCounters()
     return this._indexes.shift();
@@ -116,7 +113,7 @@ export class SelectionIndex {
      return this._curentKeyPressCounter + this._totalKeyPressCounter
      
   }
-  private currentIndexPair () : indexes {
+  private currentIndexPair () : i.indexes {
     return this._indexes[0];
   }
 

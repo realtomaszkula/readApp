@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "amd",
         "outDir": "scripts/js",
-        "target": "es5",
+        "target": "es6",
         "sourceMap": true,
         "removeComments": true,
         "watch": true

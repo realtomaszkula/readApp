@@ -5,10 +5,15 @@
 import syntax = require('./modules/syntaxHighlighting')
 import a = require('./classes/autocomplete')
 import s = require('./classes/selection')
+import inteli = require('./classes/intelisense')
 import * as $ from 'jquery'
 
 const customSnippets  = {
-    'btn' : 'button',
+  'btn' : 'button',
+  'pfr' : 'preflop raiser',
+  'xrb' : 'checkraise flop {{pot}} to bet the turn {{size}}',
+  'bbb' : 'bet {{25}}% bet {{25}}% bet {{64}}%',
+  'bxb' : 'bet {{25}}% bet {{25}}% bet {{64}}%'
   };
 
 const syntaxObj = {
@@ -85,7 +90,14 @@ function selectionMode() {
 function handleInput(e) {
     let currentKey = e.which;
 
-    if (e.ctrlKey && currentKey == SPACE ) console.log("triggered autocomplete")
+    if (e.ctrlKey && currentKey == SPACE ) {
+        inputStr = $input.val(),
+        cursorPosition = inputEl.selectionStart
+        let intelisense = new inteli.intelisense({input:inputStr, position: cursorPosition, customSnippets: customSnippets})
+        let suggestions = intelisense.suggestions
+
+        console.log(suggestions)
+    }
 
     if (currentKey == ESC && selectionModeOn) turnOffSelectionMode()
     if (currentKey == TAB_KEY) {

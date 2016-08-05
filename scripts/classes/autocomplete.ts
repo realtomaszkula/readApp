@@ -1,9 +1,4 @@
-export interface autocompleteParams {
-  input: string,
-  position: number,
-  customSnippets?: {}
-}
-
+import i = require('../interfaces/interfaces')
 
 export class Autocomplete  {
   private _snippets: {} = {
@@ -17,11 +12,9 @@ export class Autocomplete  {
   private _position: number;
   private _resultString: string;
 
-  constructor(obj: autocompleteParams ) {
+  constructor(obj: i.inputPropertiesWithSnippets ) {
     this._position = obj.position;
     this._input = obj.input;
-
-
     this.mergeSnippets(obj.customSnippets);
     this.getNewString();
   }
