@@ -13,9 +13,23 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
     };
     var BACKSPACE = 8, DELETE = 46, ESC = 27, TAB_KEY = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview');
     var selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition;
-    function autocompleteMode() {
+    function turnOffSelectionMode() {
+        selectionModeOn = false;
+        console.log('selection mode off');
+    }
+    function turnOffIntelisenseMode() {
+        intelisenseModeOn = false;
+        console.log('inteli mode off');
+    }
+    function selectInputRange(selection) {
+        inputEl.setSelectionRange(selection.start, selection.end);
+    }
+    function setCurrentInputValues() {
         inputStr = $input.val(),
             cursorPosition = inputEl.selectionStart;
+    }
+    function autocompleteMode() {
+        setCurrentInputValues();
         var autocomplete = new a.Autocomplete({ customSnippets: customSnippets, input: inputStr, position: cursorPosition })
             .resultString;
         var selection = new s.Selection(autocomplete);
@@ -32,13 +46,6 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             inputEl.setSelectionRange(inputLength, inputLength);
         }
     }
-    function turnOffSelectionMode() {
-        selectionModeOn = false;
-        console.log('selection mode off');
-    }
-    function selectInputRange(selection) {
-        inputEl.setSelectionRange(selection.start, selection.end);
-    }
     function selectionMode() {
         var idxPair = selectionModeIndexes.getIndexPair;
         selectInputRange(idxPair);
@@ -46,21 +53,34 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             turnOffSelectionMode();
         }
     }
+    function intelisenseMode() {
+        setCurrentInputValues();
+        var intelisense = new inteli.intelisense({ input: inputStr, position: cursorPosition, customSnippets: customSnippets });
+        var suggestions = intelisense.suggestions;
+        console.log(suggestions);
+    }
     function handleInput(e) {
         var currentKey = e.which;
-        if (e.ctrlKey && currentKey == SPACE) {
-            inputStr = $input.val(),
-                cursorPosition = inputEl.selectionStart;
-            var intelisense = new inteli.intelisense({ input: inputStr, position: cursorPosition, customSnippets: customSnippets });
-            var suggestions = intelisense.suggestions;
-            console.log(suggestions);
-        }
-        if (currentKey == ESC && selectionModeOn)
+        if (currentKey == ESC) {
             turnOffSelectionMode();
+            turnOffintelisenseMode();
+        }
+        if (e.ctrlKey && currentKey == SPACE) {
+            intelisenseModeOn = true;
+            intelisenseMode();
+        }
         if (currentKey == TAB_KEY) {
             e.preventDefault();
             e.stopPropagation();
-            !selectionModeOn ? autocompleteMode() : selectionMode();
+            if (selectionModeOn) {
+                selectionMode();
+            }
+            else if (intelisenseModeOn) {
+                intelisenseMode();
+            }
+            else {
+                autocompleteMode();
+            }
         }
         if (selectionModeOn && currentKey != TAB_KEY) {
             selectionModeIndexes;
@@ -81,8 +101,10 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         $input.val('bbb');
         $input.on('keydown', handleInput);
         $(document).click(function (e) {
-            if (selectionModeOn)
+            if (selectionModeOn) {
                 turnOffSelectionMode();
+                turnOffIntelisenseMode();
+            }
         });
     }
     exports.run = run;
