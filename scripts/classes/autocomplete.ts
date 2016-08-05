@@ -8,7 +8,9 @@ export interface autocompleteParams {
 export class Autocomplete  {
   private _snippets: {} = {
       'pfr' : 'preflop raiser',
-      'bbb' : 'bet {{25}}% bet {{25}}% bet {{64}}%'
+      'bbb' : 'bet {{25}}% bet {{25}}% bet {{64}}%',
+      'xrb' : 'checkraise flop {{pot}} to bet the turn {{size}}'
+
   }
 
   private _input: string;
