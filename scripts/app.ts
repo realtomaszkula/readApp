@@ -21,6 +21,7 @@ const
       DELETE = 46,
       ESC = 27,
       TAB_KEY = 9,
+      SPACE = 32,
       $input = $('#read'),
       $preview = $('#preview');
 
@@ -83,6 +84,8 @@ function selectionMode() {
 
 function handleInput(e) {
     let currentKey = e.which;
+
+    if (e.ctrlKey && currentKey == SPACE ) console.log("triggered autocomplete")
 
     if (currentKey == ESC && selectionModeOn) turnOffSelectionMode()
     if (currentKey == TAB_KEY) {

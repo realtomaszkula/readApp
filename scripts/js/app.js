@@ -7,7 +7,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         'aggressive': 'red',
         'passive': 'blue'
     };
-    var BACKSPACE = 8, DELETE = 46, ESC = 27, TAB_KEY = 9, $input = $('#read'), $preview = $('#preview');
+    var BACKSPACE = 8, DELETE = 46, ESC = 27, TAB_KEY = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview');
     var selectionModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition;
     function autocompleteMode() {
         inputStr = $input.val(),
@@ -44,6 +44,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
     }
     function handleInput(e) {
         var currentKey = e.which;
+        if (e.ctrlKey && currentKey == SPACE)
+            console.log("triggered autocomplete");
         if (currentKey == ESC && selectionModeOn)
             turnOffSelectionMode();
         if (currentKey == TAB_KEY) {
