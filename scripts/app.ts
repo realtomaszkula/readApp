@@ -6,11 +6,10 @@ import syntax = require('./modules/syntaxHighlighting')
 import a = require('./classes/autocomplete')
 import s = require('./classes/selection')
 import inteli = require('./classes/intelisense')
+import i = require('./interfaces/interfaces')
 import * as $ from 'jquery'
 
 const customSnippets  = {
-  'btn' : 'button',
-  'pfr' : 'preflop raiser',
   'xrb' : 'checkraise flop {{pot}} to bet the turn {{size}}',
   'bbb' : 'bet {{25}}% bet {{25}}% bet {{64}}%',
   'bxb' : 'bet {{25}}% bet {{25}}% bet {{64}}%'
@@ -22,13 +21,15 @@ const syntaxObj = {
   };
 
 const 
+      ENTER = 13,
       BACKSPACE = 8,
       DELETE = 46,
       ESC = 27,
-      TAB_KEY = 9,
+      TAB = 9,
       SPACE = 32,
       $input = $('#read'),
-      $preview = $('#preview');
+      $preview = $('#preview'),
+      $suggestionslist = $('#suggestions-list');
 
 let 
       selectionModeOn = false,
@@ -38,29 +39,6 @@ let
       inputEl: HTMLInputElement = <HTMLInputElement>document.getElementById("read"),
       cursorPosition: number;
 
-function createSuggetstionList(suggestions: string[]) {
-  let parent = document.getElementById("suggestions-list");
-
-  while (parent.firstChild) {
-    parent.removeChild(parent.firstChild);
-  }
-
-  suggestions.forEach( suggestion => {
-      let el = document.createElement("li");
-      el.setAttribute('data-suggestion', suggestion);
-      el.textContent = suggestion
-      parent.appendChild(el);
-  })
-
-  $(parent).children().first().addClass('active')
-}
-
-function selectNextInTheList(suggestions: string[]) {
-    $('li.active').removeClass('active').next().addClass('active')
-    if ( $('li.active').length === 0 ) $("#suggestions-list").children().first().addClass('active')
-
-}
-
 function turnOffSelectionMode() {
     selectionModeOn = false;
     console.log('selection mode off')
@@ -68,10 +46,11 @@ function turnOffSelectionMode() {
 
 function turnOffIntelisenseMode() {
     intelisenseModeOn = false;
+    clearSuggestionList();
     console.log('inteli mode off')
 }
 
-function selectInputRange(selection: s.indexes) {
+function selectInputRange(selection: i.indexes) {
   inputEl.setSelectionRange(selection.start, selection.end)
 }
 
@@ -82,7 +61,6 @@ function setCurrentInputValues(){
 }
 
 function autocompleteMode () {
-  // geting values from the DOM
     setCurrentInputValues();
 
     let autocomplete = new a.Autocomplete
@@ -118,7 +96,38 @@ function selectionMode() {
     }
 }
 
+// *********** Intelisense
+
+function createSuggetstionList(suggestions: string[]) {
+  let parent = document.getElementById('suggestions-list');
+  clearSuggestionList()
+
+  suggestions.forEach( suggestion => {
+      let el = document.createElement("li");
+      el.setAttribute('data-suggestion', suggestion);
+      el.textContent = suggestion
+      parent.appendChild(el);
+  })
+
+  $(parent).children().first().addClass('active')
+}
+
+function clearSuggestionList() {
+  let parent = document.getElementById('suggestions-list');
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+}
+
+
+function selectNextInTheList() {
+    $('li.active').removeClass('active').next().addClass('active')
+    if ( $('li.active').length === 0 ) $("#suggestions-list").children().first().addClass('active')
+
+}
+
 function initializeIntelisenseMode() {
+    intelisenseModeOn = true;
     setCurrentInputValues()
     let intelisense = new inteli.intelisense({input:inputStr, position: cursorPosition, customSnippets: customSnippets})
     let suggestions = intelisense.suggestions
@@ -129,21 +138,61 @@ function intelisenseMode() {
   selectNextInTheList();
 }
 
+function replaceLastWord(input:string, replacement:string) :string  {
+  let arrOfWords = input.split(' ');
+  arrOfWords.pop()
+  arrOfWords.push(replacement)
+  return arrOfWords.join(' ')
+}
+
+function triggerCurrentSnippet() {
+  let suggestion = $('li.active').data('suggestion');
+  setCurrentInputValues();
+  let result = replaceLastWord(inputStr, suggestion);
+  $input.val(result);
+  turnOffIntelisenseMode();
+  autocompleteMode();
+
+
+
+}
+
 function handleInput(e) {
     let currentKey = e.which;
 
-
     if (currentKey == ESC ) {
       turnOffSelectionMode()
-      turnOffintelisenseMode()
+      turnOffIntelisenseMode()
+    }
+
+    if (selectionModeOn && currentKey != TAB) {
+      selectionModeIndexes
+
+      // calculate offset for selection indexes
+       if (currentKey === BACKSPACE)  {
+        // each backspace keypress decrements keypress counter
+        selectionModeIndexes.KeyPressCounter('decrement');
+       } else {
+        // each regular keypress increments keypress counter 
+        selectionModeIndexes.KeyPressCounter('increment');
+       }
     }
 
     if (e.ctrlKey && currentKey == SPACE ) {
-        intelisenseModeOn = true;
         initializeIntelisenseMode()
     }
 
-    if (currentKey == TAB_KEY) {
+    // IMPORTANT => position of intelisense matter, refactor later
+
+    if(intelisenseModeOn) {
+      if (currentKey === ENTER) {
+        e.preventDefault(); 
+        e.stopPropagation();
+        triggerCurrentSnippet()
+      }
+    }
+
+    if (currentKey == TAB) {
       e.preventDefault(); 
       e.stopPropagation();
 
@@ -156,18 +205,6 @@ function handleInput(e) {
       }
     }
 
-    if (selectionModeOn && currentKey != TAB_KEY) {
-      selectionModeIndexes
-
-      // calculate offset for selection indexes
-       if (currentKey === BACKSPACE)  {
-        // each backspace keypress decrements keypress counter
-        selectionModeIndexes.KeyPressCounter('decrement');
-       } else {
-        // each regular keypress increments keypress counter 
-        selectionModeIndexes.KeyPressCounter('increment');
-       }
-    }
 
     
 }

@@ -18,7 +18,7 @@ export class intelisense {
     return this._results;
   }
 
-  getFirstWord():string {
+  getLastWord():string {
     let substr = this._input.substring(0, this._position);
     let arrOfWords: string[] = substr.split(' ');
     return arrOfWords.pop();
@@ -30,7 +30,7 @@ export class intelisense {
 
   findSuggestions(): void {
     let keys = this.getSnippetsKeys();
-    let word = this.getFirstWord();
+    let word = this.getLastWord();
 
     this._results = keys.filter( k => k.startsWith(word) );
     // debugger

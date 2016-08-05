@@ -10,7 +10,7 @@ define(["require", "exports"], function (require, exports) {
         get suggestions() {
             return this._results;
         }
-        getFirstWord() {
+        getLastWord() {
             let substr = this._input.substring(0, this._position);
             let arrOfWords = substr.split(' ');
             return arrOfWords.pop();
@@ -20,7 +20,7 @@ define(["require", "exports"], function (require, exports) {
         }
         findSuggestions() {
             let keys = this.getSnippetsKeys();
-            let word = this.getFirstWord();
+            let word = this.getLastWord();
             this._results = keys.filter(k => k.startsWith(word));
         }
     }
