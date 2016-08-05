@@ -9,7 +9,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         'aggressive': 'red',
         'passive': 'blue'
     };
-    const ENTER = 13, BACKSPACE = 8, DELETE = 46, ESC = 27, TAB = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview'), $suggestionslist = $('#suggestions-list');
+    const UP = 38, DOWN = 40, ENTER = 13, BACKSPACE = 8, DELETE = 46, ESC = 27, TAB = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview'), $suggestionslist = $('#suggestions-list');
     let selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition;
     function turnOffSelectionMode() {
         selectionModeOn = false;
@@ -68,8 +68,16 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             parent.removeChild(parent.firstChild);
         }
     }
+    function navigateSuggestionsMenu(currentKey) {
+        currentKey == DOWN ? selectNextInTheList() : selectPrevInTheList();
+    }
     function selectNextInTheList() {
         $('li.active').removeClass('active').next().addClass('active');
+        if ($('li.active').length === 0)
+            $("#suggestions-list").children().last().addClass('active');
+    }
+    function selectPrevInTheList() {
+        $('li.active').removeClass('active').prev().addClass('active');
         if ($('li.active').length === 0)
             $("#suggestions-list").children().first().addClass('active');
     }
@@ -116,10 +124,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             initializeIntelisenseMode();
         }
         if (intelisenseModeOn) {
-            if (currentKey === ENTER) {
-                e.preventDefault();
-                e.stopPropagation();
-                triggerCurrentSnippet();
+            if (currentKey == UP || currentKey == DOWN) {
+                navigateSuggestionsMenu(currentKey);
             }
         }
         if (currentKey == TAB) {
@@ -129,7 +135,9 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
                 selectionMode();
             }
             else if (intelisenseModeOn) {
-                intelisenseMode();
+                e.preventDefault();
+                e.stopPropagation();
+                triggerCurrentSnippet();
             }
             else {
                 autocompleteMode();

@@ -21,6 +21,8 @@ const syntaxObj = {
   };
 
 const 
+      UP = 38,
+      DOWN = 40,
       ENTER = 13,
       BACKSPACE = 8,
       DELETE = 46,
@@ -120,10 +122,18 @@ function clearSuggestionList() {
 }
 
 
+function navigateSuggestionsMenu(currentKey) {
+  currentKey == DOWN ? selectNextInTheList() : selectPrevInTheList()
+}
+
 function selectNextInTheList() {
     $('li.active').removeClass('active').next().addClass('active')
-    if ( $('li.active').length === 0 ) $("#suggestions-list").children().first().addClass('active')
+    if ( $('li.active').length === 0 ) $("#suggestions-list").children().last().addClass('active')
+}
 
+function selectPrevInTheList() {
+    $('li.active').removeClass('active').prev().addClass('active')
+    if ( $('li.active').length === 0 ) $("#suggestions-list").children().first().addClass('active')
 }
 
 function initializeIntelisenseMode() {
@@ -185,10 +195,8 @@ function handleInput(e) {
     // IMPORTANT => position of intelisense matter, refactor later
 
     if(intelisenseModeOn) {
-      if (currentKey === ENTER) {
-        e.preventDefault(); 
-        e.stopPropagation();
-        triggerCurrentSnippet()
+      if (currentKey == UP ||  currentKey == DOWN) {
+        navigateSuggestionsMenu(currentKey);
       }
     }
 
@@ -199,7 +207,9 @@ function handleInput(e) {
       if (selectionModeOn) {
         selectionMode()
       } else if (intelisenseModeOn) {
-        intelisenseMode()
+          e.preventDefault(); 
+          e.stopPropagation();
+          triggerCurrentSnippet()
       } else {
         autocompleteMode()
       }
