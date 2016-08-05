@@ -39,18 +39,25 @@ let
       cursorPosition: number;
 
 function createSuggetstionList(suggestions: string[]) {
-  let parent = document.getElementById("suggestions-container");
+  let parent = document.getElementById("suggestions-list");
 
   while (parent.firstChild) {
     parent.removeChild(parent.firstChild);
   }
 
   suggestions.forEach( suggestion => {
-      let el = document.createElement("div");
+      let el = document.createElement("li");
       el.setAttribute('data-suggestion', suggestion);
       el.textContent = suggestion
       parent.appendChild(el);
   })
+
+  $(parent).children().first().addClass('active')
+}
+
+function selectNextInTheList(suggestions: string[]) {
+    $('li.active').removeClass('active').next().addClass('active')
+    if ( $('li.active').length === 0 ) $("#suggestions-list").children().first().addClass('active')
 
 }
 
@@ -111,11 +118,15 @@ function selectionMode() {
     }
 }
 
-function intelisenseMode() {
+function initializeIntelisenseMode() {
     setCurrentInputValues()
     let intelisense = new inteli.intelisense({input:inputStr, position: cursorPosition, customSnippets: customSnippets})
     let suggestions = intelisense.suggestions
     createSuggetstionList(suggestions);
+}
+
+function intelisenseMode() {
+  selectNextInTheList();
 }
 
 function handleInput(e) {
@@ -129,7 +140,7 @@ function handleInput(e) {
 
     if (e.ctrlKey && currentKey == SPACE ) {
         intelisenseModeOn = true;
-        intelisenseMode()
+        initializeIntelisenseMode()
     }
 
     if (currentKey == TAB_KEY) {

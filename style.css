@@ -10,11 +10,21 @@
   color: blue;
 }
 
-#suggestions-container > div {
+
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+li {
   height: 50px;
   width: 150px;
   border: 1px black solid;
   text-align: center;
   font-size: 25px;
   line-height: 50px;
+}
+
+.active {
+  background-color: yellow;
 }
