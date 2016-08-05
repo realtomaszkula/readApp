@@ -1,7 +1,7 @@
 define(["require", "exports"], function (require, exports) {
     "use strict";
-    var Autocomplete = (function () {
-        function Autocomplete(obj) {
+    class Autocomplete {
+        constructor(obj) {
             this._snippets = {
                 'pfr': 'preflop raiser',
                 'xrb': 'checkraise flop {{pot}} to bet the turn {{size}}',
@@ -13,36 +13,31 @@ define(["require", "exports"], function (require, exports) {
             this.mergeSnippets(obj.customSnippets);
             this.getNewString();
         }
-        Object.defineProperty(Autocomplete.prototype, "resultString", {
-            get: function () {
-                return this._resultString;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Autocomplete.prototype.mergeSnippets = function (customSnippets) {
+        get resultString() {
+            return this._resultString;
+        }
+        mergeSnippets(customSnippets) {
             this._snippets = customSnippets ? Object.assign(this._snippets, customSnippets) : this._snippets;
-        };
-        Autocomplete.prototype.getNewString = function () {
-            var firstHalf = this._input.substring(0, this._position);
-            var secondHalf = this._input.substring(this._position);
-            var arrOfWords = firstHalf.split(' ');
-            var word = arrOfWords.pop();
+        }
+        getNewString() {
+            let firstHalf = this._input.substring(0, this._position);
+            let secondHalf = this._input.substring(this._position);
+            let arrOfWords = firstHalf.split(' ');
+            let word = arrOfWords.pop();
             firstHalf = arrOfWords.join(' ');
             word = this.checkForSnippet(word);
             this._resultString = (firstHalf + ' ' + word + secondHalf).trim();
-        };
-        Autocomplete.prototype.isAvailable = function (word) {
+        }
+        isAvailable(word) {
             return this._snippets[word] !== undefined;
-        };
-        Autocomplete.prototype.checkForSnippet = function (word) {
+        }
+        checkForSnippet(word) {
             if (this.isAvailable(word)) {
                 word = this._snippets[word];
             }
             return word;
-        };
-        return Autocomplete;
-    }());
+        }
+    }
     exports.Autocomplete = Autocomplete;
 });
 //# sourceMappingURL=autocomplete.js.map

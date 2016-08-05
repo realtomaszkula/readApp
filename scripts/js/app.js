@@ -1,18 +1,30 @@
 define(["require", "exports", './modules/syntaxHighlighting', './classes/autocomplete', './classes/selection', './classes/intelisense', 'jquery'], function (require, exports, syntax, a, s, inteli, $) {
     "use strict";
-    var customSnippets = {
+    const customSnippets = {
         'btn': 'button',
         'pfr': 'preflop raiser',
         'xrb': 'checkraise flop {{pot}} to bet the turn {{size}}',
         'bbb': 'bet {{25}}% bet {{25}}% bet {{64}}%',
         'bxb': 'bet {{25}}% bet {{25}}% bet {{64}}%'
     };
-    var syntaxObj = {
+    const syntaxObj = {
         'aggressive': 'red',
         'passive': 'blue'
     };
-    var BACKSPACE = 8, DELETE = 46, ESC = 27, TAB_KEY = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview');
-    var selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition;
+    const BACKSPACE = 8, DELETE = 46, ESC = 27, TAB_KEY = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview');
+    let selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition;
+    function createSuggetstionList(suggestions) {
+        let parent = document.getElementById("suggestions-container");
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
+        suggestions.forEach(suggestion => {
+            let el = document.createElement("div");
+            el.setAttribute('data-suggestion', suggestion);
+            el.textContent = suggestion;
+            parent.appendChild(el);
+        });
+    }
     function turnOffSelectionMode() {
         selectionModeOn = false;
         console.log('selection mode off');
@@ -30,24 +42,23 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
     }
     function autocompleteMode() {
         setCurrentInputValues();
-        var autocomplete = new a.Autocomplete({ customSnippets: customSnippets, input: inputStr, position: cursorPosition })
+        let autocomplete = new a.Autocomplete({ customSnippets: customSnippets, input: inputStr, position: cursorPosition })
             .resultString;
-        var selection = new s.Selection(autocomplete);
+        let selection = new s.Selection(autocomplete);
         $input.val(selection.resultString);
         if (selection.hasSelectionMarkers) {
             selectionModeIndexes = new s.SelectionIndex(selection.selectionIndexes);
-            console.log(selectionModeIndexes);
-            var idxPair = selectionModeIndexes.getIndexPair;
+            let idxPair = selectionModeIndexes.getIndexPair;
             selectInputRange(idxPair);
             selectionModeOn = true;
         }
         else {
-            var inputLength = $input.val().length;
+            let inputLength = $input.val().length;
             inputEl.setSelectionRange(inputLength, inputLength);
         }
     }
     function selectionMode() {
-        var idxPair = selectionModeIndexes.getIndexPair;
+        let idxPair = selectionModeIndexes.getIndexPair;
         selectInputRange(idxPair);
         if (selectionModeIndexes.isEmpty()) {
             turnOffSelectionMode();
@@ -55,12 +66,12 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
     }
     function intelisenseMode() {
         setCurrentInputValues();
-        var intelisense = new inteli.intelisense({ input: inputStr, position: cursorPosition, customSnippets: customSnippets });
-        var suggestions = intelisense.suggestions;
-        console.log(suggestions);
+        let intelisense = new inteli.intelisense({ input: inputStr, position: cursorPosition, customSnippets: customSnippets });
+        let suggestions = intelisense.suggestions;
+        createSuggetstionList(suggestions);
     }
     function handleInput(e) {
-        var currentKey = e.which;
+        let currentKey = e.which;
         if (currentKey == ESC) {
             turnOffSelectionMode();
             turnOffintelisenseMode();
@@ -93,8 +104,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         }
     }
     function handlePreview(e) {
-        var previewString = $input.val();
-        var resultString = syntax.syntaxHighlight(previewString, syntaxObj);
+        let previewString = $input.val();
+        let resultString = syntax.syntaxHighlight(previewString, syntaxObj);
         $preview.html(resultString);
     }
     function run() {

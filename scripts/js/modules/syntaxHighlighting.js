@@ -4,9 +4,9 @@ define(["require", "exports"], function (require, exports) {
         syntaxObj[word] === undefined;
     }
     function syntaxHighlight(previewString, syntaxObj) {
-        var previewStringArray = previewString.split(' ');
+        let previewStringArray = previewString.split(' ');
         return previewStringArray
-            .map(function (word) {
+            .map(word => {
             if (shouldNotBeHighlighted(word, syntaxObj)) {
                 return word;
             }

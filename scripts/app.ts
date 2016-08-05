@@ -38,7 +38,21 @@ let
       inputEl: HTMLInputElement = <HTMLInputElement>document.getElementById("read"),
       cursorPosition: number;
 
+function createSuggetstionList(suggestions: string[]) {
+  let parent = document.getElementById("suggestions-container");
 
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+
+  suggestions.forEach( suggestion => {
+      let el = document.createElement("div");
+      el.setAttribute('data-suggestion', suggestion);
+      el.textContent = suggestion
+      parent.appendChild(el);
+  })
+
+}
 
 function turnOffSelectionMode() {
     selectionModeOn = false;
@@ -76,7 +90,6 @@ function autocompleteMode () {
     // entering selection mode or finishing with placing cursor at EOL
     if (selection.hasSelectionMarkers) {
       selectionModeIndexes = new s.SelectionIndex(selection.selectionIndexes)
-      console.log(selectionModeIndexes)
 
       let idxPair = selectionModeIndexes.getIndexPair
       selectInputRange(idxPair)
@@ -102,7 +115,7 @@ function intelisenseMode() {
     setCurrentInputValues()
     let intelisense = new inteli.intelisense({input:inputStr, position: cursorPosition, customSnippets: customSnippets})
     let suggestions = intelisense.suggestions
-    console.log(suggestions)
+    createSuggetstionList(suggestions);
 }
 
 function handleInput(e) {
