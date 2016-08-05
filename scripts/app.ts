@@ -11,7 +11,7 @@ import * as $ from 'jquery'
 
 const customSnippets  = {
   'xrb' : 'checkraise flop {{pot}} to bet the turn {{size}}',
-  'bbb' : 'bet {{25}}% bet {{25}}% bet {{64}}%',
+  'bbb' : 'bet {{123}}% bet {{25}}% bet {{64}}%',
   'bxb' : 'bet {{25}}% bet {{25}}% bet {{64}}%'
   };
 

@@ -97,6 +97,7 @@ export class SelectionIndex {
       }
     }
     this._firstKeyPress = false;
+    console.log(this._curentKeyPressCounter)
   }
 
   private correctIndexesForNumberOfClicks() : void {

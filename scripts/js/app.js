@@ -2,7 +2,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
     "use strict";
     const customSnippets = {
         'xrb': 'checkraise flop {{pot}} to bet the turn {{size}}',
-        'bbb': 'bet {{25}}% bet {{25}}% bet {{64}}%',
+        'bbb': 'bet {{123}}% bet {{25}}% bet {{64}}%',
         'bxb': 'bet {{25}}% bet {{25}}% bet {{64}}%'
     };
     const syntaxObj = {

@@ -82,6 +82,7 @@ define(["require", "exports"], function (require, exports) {
                 }
             }
             this._firstKeyPress = false;
+            console.log(this._curentKeyPressCounter);
         }
         correctIndexesForNumberOfClicks() {
             let idx = this.currentIndexPair(), offset = this.calculateOffSet();
