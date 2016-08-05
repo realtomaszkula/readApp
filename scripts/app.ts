@@ -32,6 +32,7 @@ const
 
 let 
       selectionModeOn = false,
+      intelisenseModeOn = false,
       selectionModeIndexes: s.SelectionIndex,
       inputStr: string,
       inputEl: HTMLInputElement = <HTMLInputElement>document.getElementById("read"),

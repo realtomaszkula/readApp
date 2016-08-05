@@ -12,7 +12,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         'passive': 'blue'
     };
     var BACKSPACE = 8, DELETE = 46, ESC = 27, TAB_KEY = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview');
-    var selectionModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition;
+    var selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition;
     function autocompleteMode() {
         inputStr = $input.val(),
             cursorPosition = inputEl.selectionStart;
