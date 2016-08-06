@@ -5,6 +5,7 @@
 import syntax = require('./modules/syntaxHighlighting')
 import a = require('./classes/autocomplete')
 import s = require('./classes/selection')
+import input = require('./classes/input')
 import inteli = require('./classes/intelisense')
 import i = require('./interfaces/interfaces')
 import * as $ from 'jquery'
@@ -38,21 +39,9 @@ let
       selectionModeOn = false,
       intelisenseModeOn = false,
       selectionModeIndexes: s.SelectionIndex,
-      inputStr: string,
-      inputEl: HTMLInputElement = <HTMLInputElement>document.getElementById("read"),
-      cursorPosition: number,
       listControl: inteli.ListControl;
 
 
-
-function selectInputRange(selection: i.indexes) {
-  inputEl.setSelectionRange(selection.start, selection.end)
-}
-
-function setCurrentInputValues(){
-    inputStr = $input.val(),
-    cursorPosition = inputEl.selectionStart
-}
 
 function autocompleteMode () {
     setCurrentInputValues();
@@ -114,20 +103,12 @@ function initializeIntelisenseMode() {
     listControl.createSuggetstionList()
 }
 
-function replaceLastWord(input:string, replacement:string) :string  {
-  let arrOfWords = input.split(' ');
-  arrOfWords.pop()
-  arrOfWords.push(replacement)
-  return arrOfWords.join(' ')
-}
-
 function paseSuggetionWordIntoInput() {
   let suggestion = listControl.suggestion;
-  setCurrentInputValues();
-  let result = replaceLastWord(inputStr, suggestion);
-  $input.val(result);
-}
-
+  let inputControl = new input.Control($input);
+  inputControl.replaceLastWord(suggestion);
+} 
+ 
 function triggerCurrentSnippet() {
   paseSuggetionWordIntoInput();
   turnOffIntelisenseMode();

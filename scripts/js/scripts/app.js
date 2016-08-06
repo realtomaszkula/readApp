@@ -1,4 +1,4 @@
-define(["require", "exports", './modules/syntaxHighlighting', './classes/autocomplete', './classes/selection', './classes/input', './classes/intelisense', 'jquery'], function (require, exports, syntax, a, s, input, inteli, $) {
+define(["require", "exports", './modules/syntaxHighlighting', './classes/autocomplete', './classes/selection', './classes/intelisense', 'jquery'], function (require, exports, syntax, a, s, inteli, $) {
     "use strict";
     const customSnippets = {
         'xrb': 'checkraise flop {{pot}} to bet the turn {{size}}',
@@ -10,7 +10,14 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         'passive': 'blue'
     };
     const UP = 38, DOWN = 40, ENTER = 13, BACKSPACE = 8, DELETE = 46, ESC = 27, TAB = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview'), $suggestionslist = $('#suggestions-list'), suggestionslist = document.getElementById("suggestions-list");
-    let selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, listControl;
+    let selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition, listControl;
+    function selectInputRange(selection) {
+        inputEl.setSelectionRange(selection.start, selection.end);
+    }
+    function setCurrentInputValues() {
+        inputStr = $input.val(),
+            cursorPosition = inputEl.selectionStart;
+    }
     function autocompleteMode() {
         setCurrentInputValues();
         let autocomplete = new a.Autocomplete({ customSnippets: customSnippets, input: inputStr, position: cursorPosition })
@@ -55,11 +62,19 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         });
         listControl.createSuggetstionList();
     }
+    function replaceLastWord(input, replacement) {
+        let arrOfWords = input.split(' ');
+        arrOfWords.pop();
+        arrOfWords.push(replacement);
+        return arrOfWords.join(' ');
+    }
     function paseSuggetionWordIntoInput() {
         let suggestion = listControl.suggestion;
-        let inputControl = new input.Control($input);
-        inputControl.replaceLastWord(suggestion);
+        setCurrentInputValues();
+        let result = replaceLastWord(inputStr, suggestion);
+        $input.val(result);
     }
+    0;
     function triggerCurrentSnippet() {
         paseSuggetionWordIntoInput();
         turnOffIntelisenseMode();
