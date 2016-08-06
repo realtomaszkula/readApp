@@ -9,17 +9,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         'aggressive': 'red',
         'passive': 'blue'
     };
-    const UP = 38, DOWN = 40, ENTER = 13, BACKSPACE = 8, DELETE = 46, ESC = 27, TAB = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview'), $suggestionslist = $('#suggestions-list');
-    let selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition;
-    function turnOffSelectionMode() {
-        selectionModeOn = false;
-        console.log('selection mode off');
-    }
-    function turnOffIntelisenseMode() {
-        intelisenseModeOn = false;
-        clearSuggestionList();
-        console.log('inteli mode off');
-    }
+    const UP = 38, DOWN = 40, ENTER = 13, BACKSPACE = 8, DELETE = 46, ESC = 27, TAB = 9, SPACE = 32, $input = $('#read'), $preview = $('#preview'), $suggestionslist = $('#suggestions-list'), suggestionslist = document.getElementById("suggestions-list");
+    let selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, inputStr, inputEl = document.getElementById("read"), cursorPosition, listControl;
     function selectInputRange(selection) {
         inputEl.setSelectionRange(selection.start, selection.end);
     }
@@ -44,6 +35,10 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             inputEl.setSelectionRange(inputLength, inputLength);
         }
     }
+    function turnOffSelectionMode() {
+        selectionModeOn = false;
+        console.log('selection mode off');
+    }
     function selectionMode() {
         let idxPair = selectionModeIndexes.getIndexPair;
         selectInputRange(idxPair);
@@ -51,42 +46,21 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             turnOffSelectionMode();
         }
     }
-    function createSuggetstionList(suggestions) {
-        let parent = document.getElementById('suggestions-list');
-        clearSuggestionList();
-        suggestions.forEach(suggestion => {
-            let el = document.createElement("li");
-            el.setAttribute('data-suggestion', suggestion);
-            el.textContent = suggestion;
-            parent.appendChild(el);
-        });
-        $(parent).children().first().addClass('active');
-    }
-    function clearSuggestionList() {
-        let parent = document.getElementById('suggestions-list');
-        while (parent.firstChild) {
-            parent.removeChild(parent.firstChild);
-        }
-    }
-    function navigateSuggestionsMenu(currentKey) {
-        currentKey == DOWN ? selectNextInTheList() : selectPrevInTheList();
-    }
-    function selectNextInTheList() {
-        $('li.active').removeClass('active').next().addClass('active');
-        if ($('li.active').length === 0)
-            $("#suggestions-list").children().last().addClass('active');
-    }
-    function selectPrevInTheList() {
-        $('li.active').removeClass('active').prev().addClass('active');
-        if ($('li.active').length === 0)
-            $("#suggestions-list").children().first().addClass('active');
+    function turnOffIntelisenseMode() {
+        intelisenseModeOn = false;
+        listControl.clearSuggestionList();
+        listControl = null;
+        console.log('inteli mode off');
     }
     function initializeIntelisenseMode() {
         intelisenseModeOn = true;
         setCurrentInputValues();
-        let intelisense = new inteli.intelisense({ input: inputStr, position: cursorPosition, customSnippets: customSnippets });
-        let suggestions = intelisense.suggestions;
-        createSuggetstionList(suggestions);
+        let intelisense = new inteli.Sense({ input: inputStr, position: cursorPosition, customSnippets: customSnippets });
+        listControl = new inteli.ListControl({
+            parent: suggestionslist,
+            suggestions: intelisense.suggestions
+        });
+        listControl.createSuggetstionList();
     }
     function replaceLastWord(input, replacement) {
         let arrOfWords = input.split(' ');
@@ -95,7 +69,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         return arrOfWords.join(' ');
     }
     function paseSuggetionWordIntoInput() {
-        let suggestion = $('li.active').data('suggestion');
+        let suggestion = listControl.suggestion;
         setCurrentInputValues();
         let result = replaceLastWord(inputStr, suggestion);
         $input.val(result);
@@ -115,8 +89,11 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             initializeIntelisenseMode();
         }
         if (intelisenseModeOn) {
-            if (currentKey == UP || currentKey == DOWN) {
-                navigateSuggestionsMenu(currentKey);
+            if (currentKey == UP) {
+                listControl.selectPrevInTheList();
+            }
+            if (currentKey == DOWN) {
+                listControl.selectNextInTheList();
             }
             if (currentKey == BACKSPACE) {
                 turnOffIntelisenseMode();

@@ -1,6 +1,6 @@
 import i = require('../interfaces/interfaces')
 
-export class intelisense {
+export class Sense {
   private _position;
   private _input;
   private _snippets;
@@ -35,4 +35,57 @@ export class intelisense {
     this._results = keys.filter( k => k.startsWith(word) );
     // debugger
   }
+}
+
+
+export class ListControl {
+  
+  private _parent;
+  private _suggestions;
+  private _active;
+
+    constructor(obj: i.listParams){
+      this._parent = obj.parent;
+      this._suggestions = obj.suggestions;
+    }
+
+  get suggestion ():string {
+    return $('.suggestion.active').data('suggestion');
+  }
+
+  createSuggetstionList() {
+    this._suggestions.forEach( suggestion => {
+        let el = this.createEl(suggestion)
+        this._parent.appendChild(el);   
+    $(this._parent).children().first().addClass('active')
+    })
+  }
+
+  clearSuggestionList() {
+    while (this._parent.firstChild) {
+      this._parent.removeChild(this._parent.firstChild);
+    }
+  }
+
+  selectNextInTheList() {
+    $('.suggestion.active').removeClass('active').next().addClass('active')
+    if ( $('.suggestion.active').length === 0 ) $(this._parent).children().last().addClass('active')
+  }
+
+  selectPrevInTheList() {
+    $('.suggestion.active').removeClass('active').prev().addClass('active')
+    if ( $('.suggestion.active').length === 0 ) $(this._parent).children().first().addClass('active')
+  }
+
+  private createEl(suggestion): HTMLElement {
+      let el = document.createElement("li");
+      el.setAttribute('data-suggestion', suggestion);
+      el.className = 'suggestion';
+      el.textContent = suggestion
+      return el
+  }
+}
+
+
+    
 }

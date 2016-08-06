@@ -31,7 +31,8 @@ const
       SPACE = 32,
       $input = $('#read'),
       $preview = $('#preview'),
-      $suggestionslist = $('#suggestions-list');
+      $suggestionslist = $('#suggestions-list'),
+      suggestionslist: HTMLInputElement = <HTMLInputElement>document.getElementById("suggestions-list");
 
 let 
       selectionModeOn = false,
@@ -39,23 +40,14 @@ let
       selectionModeIndexes: s.SelectionIndex,
       inputStr: string,
       inputEl: HTMLInputElement = <HTMLInputElement>document.getElementById("read"),
-      cursorPosition: number;
+      cursorPosition: number,
+      listControl: inteli.ListControl;
 
-function turnOffSelectionMode() {
-    selectionModeOn = false;
-    console.log('selection mode off')
-}
 
-function turnOffIntelisenseMode() {
-    intelisenseModeOn = false;
-    clearSuggestionList();
-    console.log('inteli mode off')
-}
 
 function selectInputRange(selection: i.indexes) {
   inputEl.setSelectionRange(selection.start, selection.end)
 }
-
 
 function setCurrentInputValues(){
     inputStr = $input.val(),
@@ -88,6 +80,11 @@ function autocompleteMode () {
     }
 }
 
+function turnOffSelectionMode() {
+    selectionModeOn = false;
+    console.log('selection mode off')
+}
+
 function selectionMode() {
     let idxPair = selectionModeIndexes.getIndexPair
     selectInputRange(idxPair)
@@ -97,49 +94,24 @@ function selectionMode() {
     }
 }
 
-// *********** Intelisense
 
-function createSuggetstionList(suggestions: string[]) {
-  let parent = document.getElementById('suggestions-list');
-  clearSuggestionList()
-
-  suggestions.forEach( suggestion => {
-      let el = document.createElement("li");
-      el.setAttribute('data-suggestion', suggestion);
-      el.textContent = suggestion
-      parent.appendChild(el);
-  })
-
-  $(parent).children().first().addClass('active')
-}
-
-function clearSuggestionList() {
-  let parent = document.getElementById('suggestions-list');
-  while (parent.firstChild) {
-    parent.removeChild(parent.firstChild);
-  }
-}
-
-function navigateSuggestionsMenu(currentKey) {
-  currentKey == DOWN ? selectNextInTheList() : selectPrevInTheList()
-}
-
-function selectNextInTheList() {
-    $('li.active').removeClass('active').next().addClass('active')
-    if ( $('li.active').length === 0 ) $("#suggestions-list").children().last().addClass('active')
-}
-
-function selectPrevInTheList() {
-    $('li.active').removeClass('active').prev().addClass('active')
-    if ( $('li.active').length === 0 ) $("#suggestions-list").children().first().addClass('active')
+function turnOffIntelisenseMode() {
+    intelisenseModeOn = false;
+    listControl.clearSuggestionList()
+    listControl = null;
+    console.log('inteli mode off')
 }
 
 function initializeIntelisenseMode() {
     intelisenseModeOn = true;
     setCurrentInputValues()
-    let intelisense = new inteli.intelisense({input:inputStr, position: cursorPosition, customSnippets: customSnippets})
-    let suggestions = intelisense.suggestions
-    createSuggetstionList(suggestions);
+    let intelisense = new inteli.Sense({input:inputStr, position: cursorPosition, customSnippets: customSnippets})
+    listControl = new inteli.ListControl(
+      {
+        parent: suggestionslist,
+        suggestions: intelisense.suggestions
+      })
+    listControl.createSuggetstionList()
 }
 
 function replaceLastWord(input:string, replacement:string) :string  {
@@ -150,7 +122,7 @@ function replaceLastWord(input:string, replacement:string) :string  {
 }
 
 function paseSuggetionWordIntoInput() {
-  let suggestion = $('li.active').data('suggestion');
+  let suggestion = listControl.suggestion;
   setCurrentInputValues();
   let result = replaceLastWord(inputStr, suggestion);
   $input.val(result);
@@ -177,8 +149,12 @@ function handleInput(e) {
     // INTELISENSE
     if(intelisenseModeOn) {
 
-      if (currentKey == UP ||  currentKey == DOWN) {
-        navigateSuggestionsMenu(currentKey);
+      if (currentKey == UP ) {
+        listControl.selectPrevInTheList()
+      }
+
+      if ( currentKey == DOWN) {
+        listControl.selectNextInTheList()
       }
 
       if (currentKey == BACKSPACE) {
