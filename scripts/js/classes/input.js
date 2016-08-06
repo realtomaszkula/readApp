@@ -15,14 +15,23 @@ define(["require", "exports"], function (require, exports) {
         get cursorPosition() {
             return this._cursorPosition;
         }
+        selectEndOfLine() {
+            let inputLength = this.value.length;
+            this._el.setSelectionRange(inputLength, inputLength);
+        }
         selectRange(selection) {
             this._el.setSelectionRange(selection.start, selection.end);
         }
         replaceLastWord(replacement) {
             let val = this.value.trim();
             let lastSpace = val.lastIndexOf(" ");
-            let withoutLastWord = val.substring(0, lastSpace);
-            this.value(withoutLastWord + replacement);
+            if (lastSpace == -1) {
+                this.value = replacement;
+            }
+            else {
+                let withoutLastWord = val.substring(0, lastSpace);
+                this.value = withoutLastWord + replacement;
+            }
         }
     }
     exports.Control = Control;

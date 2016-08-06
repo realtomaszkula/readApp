@@ -9,63 +9,40 @@ import input = require('./classes/input')
 import inteli = require('./classes/intelisense')
 import i = require('./interfaces/interfaces')
 import * as $ from 'jquery'
+import config = require('./constants/basic_config');
+import keys = require('./constants/keys');
 
-const customSnippets  = {
-  'xrb' : 'checkraise flop {{pot}} to bet the turn {{size}}',
-  'bbb' : 'bet {{123}}% bet {{25}}% bet {{64}}%',
-  'bxb' : 'bet {{25}}% bet {{25}}% bet {{64}}%'
-  };
 
-const syntaxObj = {
-    'aggressive' : 'red',
-    'passive' : 'blue'
-  };
-
-const 
-      UP = 38,
-      DOWN = 40,
-      ENTER = 13,
-      BACKSPACE = 8,
-      DELETE = 46,
-      ESC = 27,
-      TAB = 9,
-      SPACE = 32,
+const
       $input = $('#read'),
       $preview = $('#preview'),
-      $suggestionslist = $('#suggestions-list'),
-      suggestionslist: HTMLInputElement = <HTMLInputElement>document.getElementById("suggestions-list");
-
+      $suggestionslist = $('#suggestions-list');
 let 
       selectionModeOn = false,
       intelisenseModeOn = false,
       selectionModeIndexes: s.SelectionIndex,
       listControl: inteli.ListControl;
 
-
-
 function autocompleteMode () {
-    setCurrentInputValues();
+    let inputControl = new input.Control($input);
     let autocomplete = new a.Autocomplete
-        ({customSnippets: customSnippets, input: inputStr, position: cursorPosition})
+        ({customSnippets: config.customSnippets, input: inputControl.value, position: inputControl.cursorPosition})
         .resultString
         
     let selection = new s.Selection(autocomplete);
-
-    // filling value
-    $input.val(selection.resultString);
+    inputControl.value = selection.resultString
 
     // entering selection mode or finishing with placing cursor at EOL
     if (selection.hasSelectionMarkers) {
       selectionModeIndexes = new s.SelectionIndex(selection.selectionIndexes)
 
       let idxPair = selectionModeIndexes.getIndexPair
-      selectInputRange(idxPair)
+      inputControl.selectRange(idxPair)
 
       selectionModeOn = true;
     } else {
       // placing cursor at the end of the line
-      let inputLength = $input.val().length
-      inputEl.setSelectionRange(inputLength, inputLength)
+      inputControl.selectEndOfLine()
     }
 }
 
@@ -75,14 +52,14 @@ function turnOffSelectionMode() {
 }
 
 function selectionMode() {
+    let inputControl = new input.Control($input);
     let idxPair = selectionModeIndexes.getIndexPair
-    selectInputRange(idxPair)
+    inputControl.selectRange(idxPair)
 
     if (selectionModeIndexes.isEmpty()) {
       turnOffSelectionMode();
     }
 }
-
 
 function turnOffIntelisenseMode() {
     intelisenseModeOn = false;
@@ -93,24 +70,23 @@ function turnOffIntelisenseMode() {
 
 function initializeIntelisenseMode() {
     intelisenseModeOn = true;
-    setCurrentInputValues()
-    let intelisense = new inteli.Sense({input:inputStr, position: cursorPosition, customSnippets: customSnippets})
+    let inputControl = new input.Control($input);
+    let intelisense = new inteli.Sense({input:inputControl.value, position: inputControl.cursorPosition, customSnippets: config.customSnippets})
     listControl = new inteli.ListControl(
       {
-        parent: suggestionslist,
+        parent: $suggestionslist,
         suggestions: intelisense.suggestions
       })
     listControl.createSuggetstionList()
 }
 
-function paseSuggetionWordIntoInput() {
-  let suggestion = listControl.suggestion;
-  let inputControl = new input.Control($input);
-  inputControl.replaceLastWord(suggestion);
-} 
- 
 function triggerCurrentSnippet() {
-  paseSuggetionWordIntoInput();
+  let inputControl = new input.Control($input);
+  // pasting suggestion inside input box
+  let suggestion = listControl.suggestion;
+  debugger
+  inputControl.replaceLastWord(suggestion);
+  
   turnOffIntelisenseMode();
   autocompleteMode();
 }
@@ -118,31 +94,32 @@ function triggerCurrentSnippet() {
 function handleInput(e) {
     let currentKey = e.which;
 
-    if (currentKey == ESC ) {
+    if (currentKey == keys.ESC ) {
       turnOffSelectionMode()
       turnOffIntelisenseMode()
     }
 
-    if (e.ctrlKey && currentKey == SPACE ) {
+    if (e.ctrlKey && currentKey == keys.SPACE ) {
+        // debugger
         initializeIntelisenseMode()
     }
 
     // INTELISENSE
     if(intelisenseModeOn) {
 
-      if (currentKey == UP ) {
+      if (currentKey == keys.UP ) {
         listControl.selectPrevInTheList()
       }
 
-      if ( currentKey == DOWN) {
+      if ( currentKey == keys.DOWN) {
         listControl.selectNextInTheList()
       }
 
-      if (currentKey == BACKSPACE) {
+      if (currentKey == keys.BACKSPACE) {
         turnOffIntelisenseMode();
       }
 
-      if (currentKey == TAB || currentKey == ENTER) {
+      if (currentKey == keys.TAB || currentKey == keys.ENTER) {
         e.preventDefault();
         triggerCurrentSnippet()
       }
@@ -151,12 +128,12 @@ function handleInput(e) {
 
     // SELECTION MODE
    else if(selectionModeOn) {
-      if (currentKey == TAB) {
+      if (currentKey == keys.TAB) {
         e.preventDefault();
         selectionMode()
       }
       // calculate offset for selection indexes
-      else if (currentKey === BACKSPACE)  {
+      else if (currentKey === keys.BACKSPACE)  {
         selectionModeIndexes.KeyPressCounter('decrement');
       } 
       else {
@@ -165,7 +142,7 @@ function handleInput(e) {
   
     }
 
-    else if (currentKey == TAB) {
+    else if (currentKey == keys.TAB) {
           e.preventDefault();
           autocompleteMode()
       }
@@ -176,7 +153,7 @@ function handleInput(e) {
 
 function handlePreview(e) {
   let previewString: string = $input.val();
-  let resultString: string = syntax.syntaxHighlight(previewString, syntaxObj);
+  let resultString: string = syntax.syntaxHighlight(previewString, config.syntaxObj);
   $preview.html(resultString);
 }
 

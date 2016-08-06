@@ -8,11 +8,11 @@ export class Control {
 
   constructor(input: JQuery){
     this._$el = input;
-    this._el = <HTMLInputElement> input[0];
+    this._el = <HTMLInputElement>input[0];
     this._cursorPosition = this._el.selectionStart;
   }
 
-  set value (value) {
+  set value (value:string) {
     this._$el.val(value);
   }
 
@@ -24,6 +24,11 @@ export class Control {
     return this._cursorPosition;
   }
 
+  selectEndOfLine() {
+    let inputLength: number = this.value.length
+    this._el.setSelectionRange(inputLength, inputLength)
+  }
+
   selectRange(selection: i.indexes){
     this._el.setSelectionRange(selection.start, selection.end)
   }
@@ -31,9 +36,14 @@ export class Control {
   replaceLastWord(replacement: string) {
     let val = this.value.trim();
     let lastSpace = val.lastIndexOf(" ");
-    let withoutLastWord = val.substring(0, lastSpace);
 
-    this.value(withoutLastWord + replacement);
+    if (lastSpace == -1) {
+      // -1 means no spaces in the string
+      this.value = replacement
+    } else {
+      let withoutLastWord = val.substring(0, lastSpace);
+      this.value = withoutLastWord + replacement
+    }
   }
 
 }

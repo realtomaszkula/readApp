@@ -27,7 +27,8 @@ define(["require", "exports"], function (require, exports) {
     exports.Sense = Sense;
     class ListControl {
         constructor(obj) {
-            this._parent = obj.parent;
+            this._parent = obj.parent[0];
+            this._$parent = obj.parent;
             this._suggestions = obj.suggestions;
         }
         get suggestion() {
@@ -37,7 +38,7 @@ define(["require", "exports"], function (require, exports) {
             this._suggestions.forEach(suggestion => {
                 let el = this.createEl(suggestion);
                 this._parent.appendChild(el);
-                $(this._parent).children().first().addClass('active');
+                this._$parent.children().first().addClass('active');
             });
         }
         clearSuggestionList() {
@@ -48,12 +49,12 @@ define(["require", "exports"], function (require, exports) {
         selectNextInTheList() {
             $('.suggestion.active').removeClass('active').next().addClass('active');
             if ($('.suggestion.active').length === 0)
-                $(this._parent).children().last().addClass('active');
+                this._$parent.children().last().addClass('active');
         }
         selectPrevInTheList() {
             $('.suggestion.active').removeClass('active').prev().addClass('active');
             if ($('.suggestion.active').length === 0)
-                $(this._parent).children().first().addClass('active');
+                this._$parent.children().first().addClass('active');
         }
         createEl(suggestion) {
             let el = document.createElement("li");

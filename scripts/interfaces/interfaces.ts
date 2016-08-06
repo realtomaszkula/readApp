@@ -1,3 +1,5 @@
+/// <reference path="../../typings/jquery.d.ts" />
+
 export interface inputProperties {
   input: string,
   position: number,
@@ -15,6 +17,6 @@ export interface indexes {
 
 
 export interface listParams {
-  parent: HTMLInputElement, 
+  parent: JQuery, 
   suggestions: string[]
 }
