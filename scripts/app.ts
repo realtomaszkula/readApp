@@ -131,6 +131,7 @@ function handleInput(e) {
 
     // SELECTION MODE
    else if(selectionModeOn) {
+    //  debugger
       if (currentKey == keys.TAB) {
         e.preventDefault();
         selectionMode()

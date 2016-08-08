@@ -25,12 +25,14 @@ define(["require", "exports"], function (require, exports) {
         }
         collectSelectionIndexes() {
             const selectionRegEx = /\{\{.+?(?=\})\}\}/g;
-            let startIndexOffset = 0, endIndexOffset = 4, result, start, end;
+            let startIndexOffset = 0, endIndexOffset = 4, result;
             while (result = selectionRegEx.exec(this._input)) {
+                let start = result.index - startIndexOffset;
+                let end = selectionRegEx.lastIndex - endIndexOffset;
                 let obj = {
-                    start: result.index - startIndexOffset,
-                    end: selectionRegEx.lastIndex - endIndexOffset,
-                    length: end - start + 1
+                    start: start,
+                    end: end,
+                    length: end - start
                 };
                 this._indexes.push(obj);
                 startIndexOffset += 4;
@@ -62,6 +64,7 @@ define(["require", "exports"], function (require, exports) {
         get getIndexPair() {
             if (!this._firstKeyPress)
                 this.correctIndexesForNumberOfClicks();
+            this._lastIndexPairLength = this._indexes[0].length;
             this.resetCounters();
             return this._indexes.shift();
         }
@@ -71,13 +74,13 @@ define(["require", "exports"], function (require, exports) {
         KeyPressCounter(changeType) {
             if (changeType === 'increment') {
                 if (this._firstKeyPress) {
-                    this._curentKeyPressCounter -= this._indexes.length;
+                    this._curentKeyPressCounter -= this._lastIndexPairLength;
                 }
                 this._curentKeyPressCounter++;
             }
             if (changeType === 'decrement') {
                 if (this._firstKeyPress) {
-                    this._curentKeyPressCounter -= this._indexes.length;
+                    this._curentKeyPressCounter -= this._lastIndexPairLength;
                 }
                 else {
                     this._curentKeyPressCounter--;

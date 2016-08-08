@@ -33,15 +33,16 @@ export class Selection {
     let 
         startIndexOffset = 0,
         endIndexOffset = 4,
-        result,
-        start: number,
-        end: number;
+        result;
     
     while ( result = selectionRegEx.exec(this._input) ) {
+      let start = result.index - startIndexOffset;
+      let end = selectionRegEx.lastIndex - endIndexOffset;
+
       let obj = {
-        start :  result.index - startIndexOffset,
-        end : selectionRegEx.lastIndex - endIndexOffset,
-        length: end-start + 1
+        start :  start,
+        end : end,
+        length: end - start
       }
       
       this._indexes.push(obj)
@@ -69,13 +70,15 @@ export class Selection {
 
 export class SelectionIndex {
   private _totalKeyPressCounter: number = 0;
-  private _curentKeyPressCounter: number = 0
+  private _curentKeyPressCounter: number = 0;
   private _firstKeyPress = true;
+  private _lastIndexPairLength: number;
 
   constructor ( private _indexes: i.indexes[] ) {}
 
   get getIndexPair (): i.indexes  {
     if (!this._firstKeyPress) this.correctIndexesForNumberOfClicks();
+    this._lastIndexPairLength = this._indexes[0].length;
     this.resetCounters()
     return this._indexes.shift();
   }
@@ -87,13 +90,13 @@ export class SelectionIndex {
   KeyPressCounter(changeType: 'increment' | 'decrement' ) {
     if (changeType === 'increment') {
       if (this._firstKeyPress) {
-        this._curentKeyPressCounter -= this._indexes.length
+        this._curentKeyPressCounter -= this._lastIndexPairLength;
       }
       this._curentKeyPressCounter++
     }     
     if (changeType === 'decrement') {
       if (this._firstKeyPress) {
-        this._curentKeyPressCounter -= this._indexes.length
+        this._curentKeyPressCounter -= this._lastIndexPairLength;
       } else {
         this._curentKeyPressCounter--
       }
@@ -119,10 +122,6 @@ export class SelectionIndex {
   private currentIndexPair () : i.indexes {
     return this._indexes[0];
   }
-
-  // private currentWordLength(): number {
-  //   return this._indexes[0].end - this._indexes[0].start;
-  // }
 
   private resetCounters(): void {
     this._totalKeyPressCounter += this._curentKeyPressCounter;
