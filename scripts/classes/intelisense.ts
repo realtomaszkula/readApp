@@ -43,15 +43,17 @@ export class ListControl {
   private _$parent: JQuery;
   private _suggestions: string[];
   private _active;
+  private _liClassName = 'suggestion'
 
     constructor(obj: i.listParams){
+      console.log('new list')
       this._parent = obj.parent[0];
       this._$parent = obj.parent;
       this._suggestions = obj.suggestions;
     }
 
   get suggestion ():string {
-    return $('.suggestion.active').data('suggestion');
+    return $(`.${this._liClassName}.active`).data('suggestion');
   }
 
   createSuggetstionList() {
@@ -69,19 +71,19 @@ export class ListControl {
   }
 
   selectNextInTheList() {
-    $('.suggestion.active').removeClass('active').next().addClass('active')
-    if ( $('.suggestion.active').length === 0 ) this._$parent.children().last().addClass('active')
+    $(`.${this._liClassName}.active`).removeClass('active').next().addClass('active')
+    if ( $(`.${this._liClassName}.active`).length === 0 ) this._$parent.children().last().addClass('active')
   }
 
   selectPrevInTheList() {
-    $('.suggestion.active').removeClass('active').prev().addClass('active')
-    if ( $('.suggestion.active').length === 0 ) this._$parent.children().first().addClass('active')
+    $(`.${this._liClassName}.active`).removeClass('active').prev().addClass('active')
+    if ( $(`.${this._liClassName}.active`).length === 0 ) this._$parent.children().first().addClass('active')
   }
 
   private createEl(suggestion): HTMLElement {
       let el = document.createElement("li");
       el.setAttribute('data-suggestion', suggestion);
-      el.className = 'suggestion';
+      el.className = this._liClassName;
       el.textContent = suggestion
       return el
   }

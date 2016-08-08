@@ -27,12 +27,14 @@ define(["require", "exports"], function (require, exports) {
     exports.Sense = Sense;
     class ListControl {
         constructor(obj) {
+            this._liClassName = 'suggestion';
+            console.log('new list');
             this._parent = obj.parent[0];
             this._$parent = obj.parent;
             this._suggestions = obj.suggestions;
         }
         get suggestion() {
-            return $('.suggestion.active').data('suggestion');
+            return $(`.${this._liClassName}.active`).data('suggestion');
         }
         createSuggetstionList() {
             this._suggestions.forEach(suggestion => {
@@ -47,19 +49,19 @@ define(["require", "exports"], function (require, exports) {
             }
         }
         selectNextInTheList() {
-            $('.suggestion.active').removeClass('active').next().addClass('active');
-            if ($('.suggestion.active').length === 0)
+            $(`.${this._liClassName}.active`).removeClass('active').next().addClass('active');
+            if ($(`.${this._liClassName}.active`).length === 0)
                 this._$parent.children().last().addClass('active');
         }
         selectPrevInTheList() {
-            $('.suggestion.active').removeClass('active').prev().addClass('active');
-            if ($('.suggestion.active').length === 0)
+            $(`.${this._liClassName}.active`).removeClass('active').prev().addClass('active');
+            if ($(`.${this._liClassName}.active`).length === 0)
                 this._$parent.children().first().addClass('active');
         }
         createEl(suggestion) {
             let el = document.createElement("li");
             el.setAttribute('data-suggestion', suggestion);
-            el.className = 'suggestion';
+            el.className = this._liClassName;
             el.textContent = suggestion;
             return el;
         }

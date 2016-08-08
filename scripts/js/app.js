@@ -1,7 +1,7 @@
 define(["require", "exports", './modules/syntaxHighlighting', './classes/autocomplete', './classes/selection', './classes/input', './classes/intelisense', 'jquery', './constants/basic_config', './constants/keys'], function (require, exports, syntax, a, s, input, inteli, $, config, keys) {
     "use strict";
     const $input = $('#read'), $preview = $('#preview'), $suggestionslist = $('#suggestions-list');
-    let selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, listControl;
+    let selectionModeOn = false, intelisenseModeOn = false, selectionModeIndexes, listControl, inteliInterval;
     function autocompleteMode() {
         let inputControl = new input.Control($input);
         let autocomplete = new a.Autocomplete({ customSnippets: config.customSnippets, input: inputControl.value, position: inputControl.cursorPosition })
@@ -33,6 +33,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
     function initializeIntelisenseMode() {
         intelisenseModeOn = true;
         let inputControl = new input.Control($input);
+        if (listControl)
+            listControl.clearSuggestionList();
         let intelisense = new inteli.Sense({ input: inputControl.value, position: inputControl.cursorPosition, customSnippets: config.customSnippets });
         listControl = new inteli.ListControl({
             parent: $suggestionslist,
@@ -50,8 +52,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         let inputControl = new input.Control($input);
         let suggestion = listControl.suggestion;
         inputControl.replaceLastWord(suggestion);
-        turnOffIntelisenseMode();
         autocompleteMode();
+        turnOffIntelisenseMode();
     }
     function handleInput(e) {
         let currentKey = e.which;
@@ -59,8 +61,11 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             turnOffSelectionMode();
             turnOffIntelisenseMode();
         }
-        if (e.ctrlKey && currentKey == keys.SPACE) {
+        if (e.ctrlKey && currentKey == keys.SPACE)
             initializeIntelisenseMode();
+        if (currentKey == keys.BACKSPACE) {
+            if (listControl)
+                listControl.clearSuggestionList();
         }
         if (intelisenseModeOn) {
             if (currentKey == keys.UP) {
@@ -70,7 +75,6 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
                 listControl.selectNextInTheList();
             }
             if (currentKey == keys.BACKSPACE) {
-                turnOffIntelisenseMode();
             }
             if (currentKey == keys.TAB || currentKey == keys.ENTER) {
                 e.preventDefault();
@@ -78,6 +82,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             }
         }
         else if (selectionModeOn) {
+            if (currentKey == keys.A && e.ctrlKey)
+                turnOffSelectionMode();
             if (currentKey == keys.TAB) {
                 e.preventDefault();
                 selectionMode();
@@ -101,16 +107,29 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         let resultString = syntax.syntaxHighlight(previewString, config.syntaxObj);
         $preview.html(resultString);
     }
+    function manageInteliSenseIntervals(e) {
+        let inputControl = new input.Control($input);
+        let inputIsNotEmpty = inputControl.value != '';
+        let entireInputIsNotSelected = !inputControl.isCtrlAed();
+        if (inputIsNotEmpty && entireInputIsNotSelected && !selectionModeOn)
+            initializeIntelisenseMode();
+    }
     function run() {
         $input.val('bbb');
-        $input.on('keydown', handleInput);
-        $input.on('keypress', handleSelection);
+        $input.on('keypress', function (e) {
+            handleSelection(e);
+        });
+        $input.on('keydown', function (e) {
+            handleInput(e);
+        });
+        $input.on('keyup', function (e) {
+            manageInteliSenseIntervals(e);
+        });
         $(document).click(function (e) {
             if (selectionModeOn) {
                 turnOffSelectionMode();
             }
             if (intelisenseModeOn) {
-                turnOffIntelisenseMode();
             }
         });
     }

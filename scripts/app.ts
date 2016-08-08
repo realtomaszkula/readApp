@@ -21,7 +21,8 @@ let
       selectionModeOn = false,
       intelisenseModeOn = false,
       selectionModeIndexes: s.SelectionIndex,
-      listControl: inteli.ListControl;
+      listControl: inteli.ListControl,
+      inteliInterval: number;
 
 // AUTOCOMPLETE
 function autocompleteMode () {
@@ -68,6 +69,7 @@ function turnOffSelectionMode() {
 function initializeIntelisenseMode() {
     intelisenseModeOn = true;
     let inputControl = new input.Control($input);
+    if (listControl) listControl.clearSuggestionList()
     let intelisense = new inteli.Sense({input:inputControl.value, position: inputControl.cursorPosition, customSnippets: config.customSnippets})
     listControl = new inteli.ListControl(
       {
@@ -89,8 +91,8 @@ function triggerCurrentSnippet() {
   let suggestion = listControl.suggestion;
   inputControl.replaceLastWord(suggestion);
   
-  turnOffIntelisenseMode();
   autocompleteMode();
+  turnOffIntelisenseMode();
 }
 
 // INPUT
@@ -98,13 +100,14 @@ function handleInput(e) {
     let currentKey = e.which;
 
     if (currentKey == keys.ESC ) {
-      turnOffSelectionMode()
-      turnOffIntelisenseMode()
+      turnOffSelectionMode();
+      turnOffIntelisenseMode();
     }
 
-    if (e.ctrlKey && currentKey == keys.SPACE ) {
-        // debugger
-        initializeIntelisenseMode()
+    if (e.ctrlKey && currentKey == keys.SPACE) initializeIntelisenseMode()
+
+    if (currentKey == keys.BACKSPACE) {
+      if (listControl) listControl.clearSuggestionList()
     }
 
     // INTELISENSE
@@ -119,7 +122,6 @@ function handleInput(e) {
       }
 
       if (currentKey == keys.BACKSPACE) {
-        turnOffIntelisenseMode();
       }
 
       if (currentKey == keys.TAB || currentKey == keys.ENTER) {
@@ -131,6 +133,8 @@ function handleInput(e) {
 
     // SELECTION MODE
    else if(selectionModeOn) {
+      if( currentKey == keys.A && e.ctrlKey) turnOffSelectionMode()
+
       if (currentKey == keys.TAB) {
         e.preventDefault();
         selectionMode()
@@ -162,10 +166,29 @@ function handlePreview(e) {
   $preview.html(resultString);
 }
 
+
+function manageInteliSenseIntervals(e){
+    let inputControl = new input.Control($input);
+    let inputIsNotEmpty = inputControl.value != '';
+    let entireInputIsNotSelected = !inputControl.isCtrlAed()
+    if ( inputIsNotEmpty && entireInputIsNotSelected && !selectionModeOn) initializeIntelisenseMode();
+}
+
 export function run() {
   $input.val('bbb');
-  $input.on('keydown', handleInput);
-  $input.on('keypress', handleSelection);
+
+
+  $input.on('keypress', function(e) {
+    handleSelection(e);
+  });
+
+  $input.on('keydown', function(e){
+    handleInput(e);
+  });
+
+  $input.on('keyup', function(e) {
+    manageInteliSenseIntervals(e)
+  });
 
   $(document).click( function (e) {
      if (selectionModeOn) {
@@ -173,7 +196,7 @@ export function run() {
      }
 
      if (intelisenseModeOn) {
-      turnOffIntelisenseMode();
+      // turnOffIntelisenseMode();
      }
   })
 

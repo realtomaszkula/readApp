@@ -46,4 +46,8 @@ export class Control {
     }
   }
 
+  isCtrlAed (): boolean {
+    return this._el.selectionStart == 0 && this._el.selectionEnd == this._el.value.length
+  }
+
 }

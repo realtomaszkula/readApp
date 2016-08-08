@@ -13,5 +13,6 @@ define(["require", "exports"], function (require, exports) {
         'aggressive': 'red',
         'passive': 'blue'
     };
+    exports.autoInteliSuggestions = true;
 });
 //# sourceMappingURL=basic_config.js.map

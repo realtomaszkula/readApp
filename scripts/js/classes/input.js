@@ -33,6 +33,9 @@ define(["require", "exports"], function (require, exports) {
                 this.value = withoutLastWord + replacement;
             }
         }
+        isCtrlAed() {
+            return this._el.selectionStart == 0 && this._el.selectionEnd == this._el.value.length;
+        }
     }
     exports.Control = Control;
 });

@@ -12,3 +12,5 @@ export const syntaxObj = {
     'aggressive' : 'red',
     'passive' : 'blue'
   };
+
+export const autoInteliSuggestions = true;
