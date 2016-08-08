@@ -23,6 +23,7 @@ let
       selectionModeIndexes: s.SelectionIndex,
       listControl: inteli.ListControl;
 
+// AUTOCOMPLETE
 function autocompleteMode () {
     let inputControl = new input.Control($input);
     let autocomplete = new a.Autocomplete
@@ -46,11 +47,7 @@ function autocompleteMode () {
     }
 }
 
-function turnOffSelectionMode() {
-    selectionModeOn = false;
-    console.log('selection mode off')
-}
-
+// SELECTION MODE
 function selectionMode() {
     let inputControl = new input.Control($input);
     let idxPair = selectionModeIndexes.getIndexPair
@@ -61,13 +58,13 @@ function selectionMode() {
     }
 }
 
-function turnOffIntelisenseMode() {
-    intelisenseModeOn = false;
-    listControl.clearSuggestionList()
-    listControl = null;
-    console.log('inteli mode off')
+function turnOffSelectionMode() {
+    selectionModeOn = false;
+    console.log('selection mode off')
 }
 
+
+// INTELISENSE
 function initializeIntelisenseMode() {
     intelisenseModeOn = true;
     let inputControl = new input.Control($input);
@@ -80,17 +77,23 @@ function initializeIntelisenseMode() {
     listControl.createSuggetstionList()
 }
 
+function turnOffIntelisenseMode() {
+    intelisenseModeOn = false;
+    listControl.clearSuggestionList()
+    listControl = null;
+    console.log('inteli mode off')
+}
 function triggerCurrentSnippet() {
   let inputControl = new input.Control($input);
   // pasting suggestion inside input box
   let suggestion = listControl.suggestion;
-  debugger
   inputControl.replaceLastWord(suggestion);
   
   turnOffIntelisenseMode();
   autocompleteMode();
 }
 
+// INPUT
 function handleInput(e) {
     let currentKey = e.which;
 
@@ -164,6 +167,9 @@ export function run() {
   $(document).click( function (e) {
      if (selectionModeOn) {
       turnOffSelectionMode();
+     }
+
+     if (intelisenseModeOn) {
       turnOffIntelisenseMode();
      }
   })

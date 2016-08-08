@@ -41,9 +41,10 @@ export class Selection {
       let obj = {
         start :  result.index - startIndexOffset,
         end : selectionRegEx.lastIndex - endIndexOffset,
+        length: end-start + 1
       }
       
-      this._indexes.push (obj)
+      this._indexes.push(obj)
 
       startIndexOffset += 4;
       endIndexOffset += 4;
@@ -61,6 +62,7 @@ export class Selection {
     this._indexes.push ({
       start : this._resultString.length,
       end : this._resultString.length,
+      length: 0
     })
   }
 }
@@ -85,13 +87,13 @@ export class SelectionIndex {
   KeyPressCounter(changeType: 'increment' | 'decrement' ) {
     if (changeType === 'increment') {
       if (this._firstKeyPress) {
-        this._curentKeyPressCounter -= this.currentWordLength()
+        this._curentKeyPressCounter -= this._indexes.length
       }
       this._curentKeyPressCounter++
     }     
     if (changeType === 'decrement') {
       if (this._firstKeyPress) {
-        this._curentKeyPressCounter -= this.currentWordLength()
+        this._curentKeyPressCounter -= this._indexes.length
       } else {
         this._curentKeyPressCounter--
       }
@@ -118,9 +120,9 @@ export class SelectionIndex {
     return this._indexes[0];
   }
 
-  private currentWordLength(): number {
-    return this._indexes[0].end - this._indexes[0].start;
-  }
+  // private currentWordLength(): number {
+  //   return this._indexes[0].end - this._indexes[0].start;
+  // }
 
   private resetCounters(): void {
     this._totalKeyPressCounter += this._curentKeyPressCounter;

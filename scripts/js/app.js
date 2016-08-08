@@ -18,10 +18,6 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             inputControl.selectEndOfLine();
         }
     }
-    function turnOffSelectionMode() {
-        selectionModeOn = false;
-        console.log('selection mode off');
-    }
     function selectionMode() {
         let inputControl = new input.Control($input);
         let idxPair = selectionModeIndexes.getIndexPair;
@@ -30,11 +26,9 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             turnOffSelectionMode();
         }
     }
-    function turnOffIntelisenseMode() {
-        intelisenseModeOn = false;
-        listControl.clearSuggestionList();
-        listControl = null;
-        console.log('inteli mode off');
+    function turnOffSelectionMode() {
+        selectionModeOn = false;
+        console.log('selection mode off');
     }
     function initializeIntelisenseMode() {
         intelisenseModeOn = true;
@@ -46,10 +40,15 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         });
         listControl.createSuggetstionList();
     }
+    function turnOffIntelisenseMode() {
+        intelisenseModeOn = false;
+        listControl.clearSuggestionList();
+        listControl = null;
+        console.log('inteli mode off');
+    }
     function triggerCurrentSnippet() {
         let inputControl = new input.Control($input);
         let suggestion = listControl.suggestion;
-        debugger;
         inputControl.replaceLastWord(suggestion);
         turnOffIntelisenseMode();
         autocompleteMode();
@@ -106,6 +105,8 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         $(document).click(function (e) {
             if (selectionModeOn) {
                 turnOffSelectionMode();
+            }
+            if (intelisenseModeOn) {
                 turnOffIntelisenseMode();
             }
         });

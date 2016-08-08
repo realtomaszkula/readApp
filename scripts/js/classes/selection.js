@@ -30,6 +30,7 @@ define(["require", "exports"], function (require, exports) {
                 let obj = {
                     start: result.index - startIndexOffset,
                     end: selectionRegEx.lastIndex - endIndexOffset,
+                    length: end - start + 1
                 };
                 this._indexes.push(obj);
                 startIndexOffset += 4;
@@ -46,6 +47,7 @@ define(["require", "exports"], function (require, exports) {
             this._indexes.push({
                 start: this._resultString.length,
                 end: this._resultString.length,
+                length: 0
             });
         }
     }
@@ -69,13 +71,13 @@ define(["require", "exports"], function (require, exports) {
         KeyPressCounter(changeType) {
             if (changeType === 'increment') {
                 if (this._firstKeyPress) {
-                    this._curentKeyPressCounter -= this.currentWordLength();
+                    this._curentKeyPressCounter -= this._indexes.length;
                 }
                 this._curentKeyPressCounter++;
             }
             if (changeType === 'decrement') {
                 if (this._firstKeyPress) {
-                    this._curentKeyPressCounter -= this.currentWordLength();
+                    this._curentKeyPressCounter -= this._indexes.length;
                 }
                 else {
                     this._curentKeyPressCounter--;
@@ -94,9 +96,6 @@ define(["require", "exports"], function (require, exports) {
         }
         currentIndexPair() {
             return this._indexes[0];
-        }
-        currentWordLength() {
-            return this._indexes[0].end - this._indexes[0].start;
         }
         resetCounters() {
             this._totalKeyPressCounter += this._curentKeyPressCounter;
