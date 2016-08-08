@@ -87,7 +87,6 @@ function turnOffIntelisenseMode() {
 }
 function triggerCurrentSnippet() {
   let inputControl = new input.Control($input);
-  // pasting suggestion inside input box
   let suggestion = listControl.suggestion;
   inputControl.replaceLastWord(suggestion);
   
@@ -139,7 +138,7 @@ function handleInput(e) {
         e.preventDefault();
         selectionMode()
       }
-      // calculate offset for selection indexes
+
       if (currentKey === keys.BACKSPACE)  {
         selectionModeIndexes.KeyPressCounter('decrement');
       } 
@@ -154,7 +153,6 @@ function handleInput(e) {
 
 function handleSelection(e) {
   // keypress handles only normal keys
-  // console.log(`triggered: ${e.which}`);
    if(selectionModeOn) {
         selectionModeIndexes.KeyPressCounter('increment');
     }
@@ -167,7 +165,7 @@ function handlePreview(e) {
 }
 
 
-function manageInteliSenseIntervals(e){
+function triggerIntelisenseOnEachKeypress(e){
     let inputControl = new input.Control($input);
     let inputIsNotEmpty = inputControl.value != '';
     let entireInputIsNotSelected = !inputControl.isCtrlAed()
@@ -187,7 +185,7 @@ export function run() {
   });
 
   $input.on('keyup', function(e) {
-    manageInteliSenseIntervals(e)
+    triggerIntelisenseOnEachKeypress(e)
   });
 
   $(document).click( function (e) {

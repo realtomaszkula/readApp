@@ -107,7 +107,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
         let resultString = syntax.syntaxHighlight(previewString, config.syntaxObj);
         $preview.html(resultString);
     }
-    function manageInteliSenseIntervals(e) {
+    function triggerIntelisenseOnEachKeypress(e) {
         let inputControl = new input.Control($input);
         let inputIsNotEmpty = inputControl.value != '';
         let entireInputIsNotSelected = !inputControl.isCtrlAed();
@@ -123,7 +123,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
             handleInput(e);
         });
         $input.on('keyup', function (e) {
-            manageInteliSenseIntervals(e);
+            triggerIntelisenseOnEachKeypress(e);
         });
         $(document).click(function (e) {
             if (selectionModeOn) {
