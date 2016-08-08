@@ -82,16 +82,18 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
                 e.preventDefault();
                 selectionMode();
             }
-            else if (currentKey === keys.BACKSPACE) {
+            if (currentKey === keys.BACKSPACE) {
                 selectionModeIndexes.KeyPressCounter('decrement');
-            }
-            else {
-                selectionModeIndexes.KeyPressCounter('increment');
             }
         }
         else if (currentKey == keys.TAB) {
             e.preventDefault();
             autocompleteMode();
+        }
+    }
+    function handleSelection(e) {
+        if (selectionModeOn) {
+            selectionModeIndexes.KeyPressCounter('increment');
         }
     }
     function handlePreview(e) {
@@ -102,6 +104,7 @@ define(["require", "exports", './modules/syntaxHighlighting', './classes/autocom
     function run() {
         $input.val('bbb');
         $input.on('keydown', handleInput);
+        $input.on('keypress', handleSelection);
         $(document).click(function (e) {
             if (selectionModeOn) {
                 turnOffSelectionMode();

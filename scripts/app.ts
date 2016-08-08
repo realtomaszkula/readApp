@@ -131,28 +131,29 @@ function handleInput(e) {
 
     // SELECTION MODE
    else if(selectionModeOn) {
-    //  debugger
       if (currentKey == keys.TAB) {
         e.preventDefault();
         selectionMode()
       }
       // calculate offset for selection indexes
-      else if (currentKey === keys.BACKSPACE)  {
+      if (currentKey === keys.BACKSPACE)  {
         selectionModeIndexes.KeyPressCounter('decrement');
       } 
-      else {
-        selectionModeIndexes.KeyPressCounter('increment');
-      }
-  
     }
 
     else if (currentKey == keys.TAB) {
           e.preventDefault();
           autocompleteMode()
-      }
+      }    
+}
 
 
-    
+function handleSelection(e) {
+  // keypress handles only normal keys
+  // console.log(`triggered: ${e.which}`);
+   if(selectionModeOn) {
+        selectionModeIndexes.KeyPressCounter('increment');
+    }
 }
 
 function handlePreview(e) {
@@ -164,6 +165,7 @@ function handlePreview(e) {
 export function run() {
   $input.val('bbb');
   $input.on('keydown', handleInput);
+  $input.on('keypress', handleSelection);
 
   $(document).click( function (e) {
      if (selectionModeOn) {
